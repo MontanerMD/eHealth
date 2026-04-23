@@ -38,40 +38,16 @@
 </head>
 <body class="text-slate-900 min-h-screen pb-20 selection:bg-blue-200 selection:text-blue-900">
 
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 shrink-0 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg shadow-blue-200 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
-                        <circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8v6m-3-3h6" />
-                    </svg>
-                </div>
-                <div>
-                    <span class="font-extrabold tracking-tight text-slate-900 text-xl block leading-tight">SCGAD</span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] block mt-0.5">CHGUV</span>
-                </div>
-            </div>
-            <div class="hidden lg:flex items-center gap-4">
-                <span id="status-badge" class="flex items-center gap-1.5 text-[10px] bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-blue-100 transition-colors duration-300">
-                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" id="status-dot"></span>
-                    <span id="status-text">Sincronización Activa</span>
-                </span>
-            </div>
-        </div>
-    </nav>
-
     <main class="max-w-5xl mx-auto px-6 pt-12">
-        <header class="mb-12">
+        <header class="mb-12 flex flex-col items-center text-center">
             <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-3 text-balance">Catálogo de Herramientas Digitales</h2>
-            <p class="text-slate-500 text-lg max-w-2xl leading-relaxed">
+            <p class="text-slate-500 text-lg max-w-2xl leading-relaxed mx-auto">
                 Repositorio centralizado de herramientas digitales para la práctica clínica.
             </p>
         </header>
 
-        <div class="mb-10">
-            <div class="relative max-w-md group">
+        <div class="mb-10 flex justify-center">
+            <div class="relative w-full max-w-md group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -94,6 +70,68 @@
             <div class="h-44 bg-white/50 border border-slate-200 rounded-3xl animate-pulse"></div>
             <div class="h-44 bg-white/50 border border-slate-200 rounded-3xl animate-pulse"></div>
         </div>
+
+        <!-- Información y Aviso Legal -->
+        <section class="mt-16 mb-4">
+            <div class="glass-card rounded-[2rem] p-6 md:p-8 shadow-sm">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    
+                    <!-- Columna de Información -->
+                    <div class="flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-extrabold text-slate-800 tracking-tight leading-tight">Sobre la plataforma</h3>
+                        </div>
+                        <div class="space-y-4 text-sm md:text-base text-slate-600 leading-relaxed">
+                            <p>
+                                Esta plataforma, de acceso público a través de la web del SCGAD-CHGUV y desarrollada por <strong class="text-slate-800 font-semibold">Andrés Montaner</strong>, integra un conjunto de herramientas digitales orientadas a facilitar y optimizar la labor asistencial de los facultativos.
+                            </p>
+                            <p>
+                                Todos los recursos y algoritmos disponibles han sido verificados y están respaldados por <strong class="text-slate-800 font-semibold">evidencia científica, bibliografía médica actualizada y los protocolos clínicos internos</strong> vigentes en el SCGAD-CHGUV.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Columna de Aviso Legal -->
+                    <div class="bg-amber-50/70 rounded-3xl p-6 md:p-7 border border-amber-100">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-inner shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <h3 class="text-lg md:text-xl font-extrabold text-slate-800 tracking-tight leading-tight">Aviso de exención de responsabilidad</h3>
+                        </div>
+                        <ul class="space-y-3.5 text-sm text-slate-700 leading-relaxed">
+                            <li class="flex items-start gap-3">
+                                <span class="text-amber-500 mt-0.5 shrink-0">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <span>Estas herramientas tienen un propósito estrictamente <strong>orientativo y de apoyo</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-amber-500 mt-0.5 shrink-0">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <span><strong>En ningún caso sustituyen el juicio clínico</strong> del profesional sanitario ni la valoración individualizada requerida para cada paciente.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-amber-500 mt-0.5 shrink-0">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <span>Ni el autor ni el SCGAD-CHGUV asumen responsabilidad legal o ética alguna por el uso que se haga de esta plataforma, por posibles inexactitudes derivadas de su aplicación, ni por las decisiones clínicas y sus consecuencias.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-amber-500 mt-0.5 shrink-0">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                </span>
+                                <span>La responsabilidad final de cualquier diagnóstico, tratamiento o acto médico <strong>recae de forma exclusiva en el facultativo a cargo</strong>.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script>
@@ -107,22 +145,6 @@
         const searchInput = document.getElementById('app-search');
         const clearButton = document.getElementById('clear-search');
         const listContainer = document.getElementById('app-list');
-
-        function updateStatus(state) {
-            const badge = document.getElementById('status-badge');
-            const dot = document.getElementById('status-dot');
-            const text = document.getElementById('status-text');
-
-            if (state === 'error') {
-                badge.className = "flex items-center gap-1.5 text-[10px] bg-red-50 text-red-700 px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-red-100 transition-colors duration-300";
-                dot.className = "w-1.5 h-1.5 bg-red-500 rounded-full";
-                text.textContent = "Desconectado";
-            } else if (state === 'success') {
-                badge.className = "flex items-center gap-1.5 text-[10px] bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-emerald-100 transition-colors duration-300";
-                dot.className = "w-1.5 h-1.5 bg-emerald-500 rounded-full";
-                text.textContent = "Sincronizado";
-            }
-        }
 
         async function fetchApps() {
             try {
@@ -138,11 +160,9 @@
                 const files = await response.json();
                 allApps = files.filter(f => f.name.endsWith('.html') && !CONFIG.exclude.includes(f.name));
 
-                updateStatus('success');
                 renderApps(allApps);
 
             } catch (error) {
-                updateStatus('error');
                 listContainer.innerHTML = `
                     <div class="col-span-full bg-red-50/50 backdrop-blur-sm border border-red-100 p-8 rounded-3xl text-red-800 flex flex-col items-center justify-center text-center gap-4">
                         <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-2">
@@ -183,18 +203,17 @@
                 card.className = "group glass-card p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:border-blue-400 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between min-h-[176px]";
                 
                 card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-5">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="mb-5 flex justify-center w-full">
                             <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-600 group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
                                 <svg class="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
-                            <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest group-hover:text-blue-300 transition-colors">Digital Tool</span>
                         </div>
                         <h3 class="font-bold text-slate-800 text-xl leading-tight mb-2 group-hover:text-blue-700 transition-colors text-balance">${cleanName}</h3>
                     </div>
-                    <div class="flex items-center gap-2 pt-4 border-t border-slate-100 group-hover:border-blue-100 mt-2">
+                    <div class="flex items-center justify-center gap-2 pt-4 border-t border-slate-100 group-hover:border-blue-100 mt-auto w-full">
                         <span class="text-[11px] font-bold text-blue-600 uppercase tracking-tighter">Acceder al recurso</span>
                         <svg class="w-3.5 h-3.5 text-blue-600 transform group-hover:translate-x-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
