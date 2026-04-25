@@ -3,52 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profilaxis Quirúrgica</title>
+    <title>Soporte Clínico: Profilaxis Quirúrgica</title>
+    
+    <!-- Google Fonts: Inter para legibilidad clínica -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        clinical: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 600: '#475569', 800: '#1e293b', 900: '#0f172a' },
+                        alert: { 50: '#fef2f2', 100: '#fee2e2', 600: '#dc2626', 700: '#b91c1c' },
+                        action: { 50: '#eff6ff', 600: '#2563eb', 700: '#1d4ed8' }
+                    }
+                }
+            }
+        }
+    </script>
     
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
-    <!-- Babel for in-browser JSX compilation -->
+    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Iconify for icons -->
+    <!-- Iconify -->
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 
     <style>
-        /* Previene destellos de contenido y cambios de layout */
-        body { 
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-            -webkit-font-smoothing: antialiased;
-        }
-        iconify-icon {
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            contain: strict; /* Evita repintados costosos y parpadeos al cargar el SVG */
-        }
+        body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; }
+        iconify-icon { display: inline-block; width: 1em; height: 1em; contain: strict; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-view { animation: fadeIn 0.3s ease-out forwards; }
         
-        /* Animaciones CSS fluidas */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-view {
-            animation: fadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
+        /* Botones mínimos de 44px para interacción segura en pantallas táctiles */
+        .btn-clinical { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
         
-        /* Scrollbar personalizado */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        /* Ocultar barra de desplazamiento para limpieza visual pero permitir scroll */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
 </head>
 <body>
-    <!-- Preload invisible de iconos para evitar CUALQUIER parpadeo de red al cambiar de pestaña -->
     <div style="position: absolute; width: 0; height: 0; overflow: hidden; visibility: hidden;" aria-hidden="true">
         <iconify-icon icon="healthicons:skin-cancer"></iconify-icon>
         <iconify-icon icon="healthicons:breasts"></iconify-icon>
@@ -74,20 +78,21 @@
         <iconify-icon icon="lucide:stethoscope"></iconify-icon>
         <iconify-icon icon="lucide:check-circle-2"></iconify-icon>
         <iconify-icon icon="lucide:info"></iconify-icon>
+        <iconify-icon icon="lucide:file-text"></iconify-icon>
+        <iconify-icon icon="lucide:alert-circle"></iconify-icon>
+        <iconify-icon icon="lucide:external-link"></iconify-icon>
     </div>
 
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         const data = [
           {
             id: 'piel',
             category: 'Piel y partes blandas',
             icon: 'healthicons:skin-cancer',
-            color: 'from-pink-500 to-rose-600',
-            bgLight: 'bg-pink-50', textDark: 'text-pink-700',
             scenarios: [
               { id: 'piel-1', name: 'Sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'piel-2', name: 'Con ≥ 1 FR', std: 'Cefazolina 2g iv', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
@@ -98,8 +103,6 @@
             id: 'mama',
             category: 'Mama',
             icon: 'healthicons:breasts',
-            color: 'from-fuchsia-500 to-purple-600',
-            bgLight: 'bg-fuchsia-50', textDark: 'text-fuchsia-700',
             scenarios: [
               { id: 'mama-1', name: 'Benigna sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'mama-2', name: 'Benigna con ≥ 1 FR', std: 'Cefazolina 2g IV', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
@@ -111,8 +114,6 @@
             id: 'hepatica',
             category: 'Hepática y pancreática',
             icon: 'healthicons:liver',
-            color: 'from-amber-500 to-orange-600',
-            bgLight: 'bg-amber-50', textDark: 'text-amber-800',
             scenarios: [
               { id: 'hep-1', name: 'Habitual (SIEMPRE, sin otros FR específicos)', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
               { id: 'hep-2', name: 'Con ≥ 1 FR', std: 'Cefuroxima 1,5g + Metronidazol 15 mg/kg', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
@@ -123,8 +124,6 @@
             id: 'biliar',
             category: 'Vía biliar',
             icon: 'healthicons:gallbladder',
-            color: 'from-emerald-400 to-teal-600',
-            bgLight: 'bg-emerald-50', textDark: 'text-emerald-800',
             scenarios: [
               { id: 'bil-1', name: 'Colecistectomía laparoscópica sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'bil-2', name: 'Resto: Bajo riesgo', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
@@ -136,8 +135,6 @@
             id: 'esofagica',
             category: 'Esofágica, gástrica y duodenal',
             icon: 'healthicons:stomach',
-            color: 'from-blue-500 to-indigo-600',
-            bgLight: 'bg-blue-50', textDark: 'text-blue-800',
             scenarios: [
               { id: 'eso-1', name: 'No rotura de mucosa sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'eso-2', name: 'Resto: Bajo riesgo', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
@@ -149,8 +146,6 @@
             id: 'bariatrica',
             category: 'Bariátrica',
             icon: 'healthicons:overweight',
-            color: 'from-violet-500 to-purple-700',
-            bgLight: 'bg-violet-50', textDark: 'text-violet-800',
             scenarios: [
               { id: 'bar-1', name: 'Peso ≤ 160kg (SIEMPRE)', std: 'Cefazolina 2g o Cefuroxima 1,5g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
               { id: 'bar-2', name: 'Peso > 160kg', std: 'Cefazolina 3g IV o Cefuroxima 3g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
@@ -160,8 +155,6 @@
             id: 'intestino',
             category: 'Intestino delgado',
             icon: 'healthicons:intestine',
-            color: 'from-teal-500 to-cyan-600',
-            bgLight: 'bg-cyan-50', textDark: 'text-cyan-800',
             scenarios: [
               { id: 'int-1', name: 'Con obstrucción de intestino delgado', std: 'Cefazolina 2g IV + Metronidazol 15 mg/kg', alg: 'Metronidazol 15mg/kg + Gentamicina 5mg/kg' },
               { id: 'int-2', name: 'Sin obstrucción de intestino delgado', std: 'Cefazolina 2g IV', alg: 'Clindamicina 600-900mg + Gentamicina 5mg/kg' }
@@ -171,8 +164,6 @@
             id: 'colorrectal',
             category: 'Colorrectal',
             icon: 'healthicons:colon',
-            color: 'from-orange-500 to-red-600',
-            bgLight: 'bg-orange-50', textDark: 'text-orange-800',
             scenarios: [
               { id: 'col-1', name: 'Cirugía proctológica', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'col-2', name: 'Colon, recto y apéndice: Bajo riesgo BGN resistentes', std: 'Cefuroxima 1,5g + Metronidazol 15mg/kg', alg: 'Metronidazol 15mg/kg + Gentamicina 5mg/kg' },
@@ -183,8 +174,6 @@
             id: 'pared',
             category: 'Pared abdominal',
             icon: 'healthicons:dhis2-logo',
-            color: 'from-slate-600 to-gray-800',
-            bgLight: 'bg-slate-100', textDark: 'text-slate-800',
             scenarios: [
               { id: 'par-1', name: 'Hernioplastia laparoscópica', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'par-2', name: 'Hernioplastia abierta (Sin colonización)', std: 'Cefazolina 2g IV', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
@@ -195,8 +184,6 @@
             id: 'cervical',
             category: 'Cervical',
             icon: 'healthicons:thyroid',
-            color: 'from-cyan-500 to-blue-600',
-            bgLight: 'bg-sky-50', textDark: 'text-sky-800',
             scenarios: [
               { id: 'cer-1', name: 'Benigna', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'cer-2', name: 'Maligna: No sospecha de SARM', std: 'Cefazolina 2g IV o Amoxicilina-Clavulánico 2g', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
@@ -207,8 +194,6 @@
             id: 'bazo',
             category: 'Bazo',
             icon: 'healthicons:spleen',
-            color: 'from-red-500 to-rose-700',
-            bgLight: 'bg-red-50', textDark: 'text-red-800',
             scenarios: [
               { id: 'baz-1', name: 'Electiva sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
               { id: 'baz-2', name: 'Electiva con ≥ 1 FR o traumática', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
@@ -234,51 +219,48 @@
             setSelectedScenario(null);
           };
 
-          // Clave única para forzar la re-animación CSS sin destellos de React
           const animationKey = `${activeTab}-${selectedSurgery?.id || 'root'}-${selectedScenario?.id || 'root'}`;
 
           const RiskFactorsCard = () => (
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60 rounded-[2rem] shadow-sm overflow-hidden mb-8 transition-all">
+            <div className="bg-white border border-clinical-200 rounded-xl shadow-sm overflow-hidden mb-6">
               <button 
                 onClick={() => setRiskOpen(!riskOpen)}
-                className="w-full flex items-center justify-between p-5 md:p-6 text-left focus:outline-none"
+                className="w-full btn-clinical px-4 py-3 md:p-5 text-left focus:outline-none flex justify-between items-center bg-clinical-50 hover:bg-clinical-100 transition-colors"
               >
-                <div className="flex items-center gap-4 font-bold text-amber-800">
-                  <div className="bg-amber-100 p-2.5 rounded-xl shadow-inner border border-amber-200/50">
-                    <iconify-icon icon="lucide:alert-triangle" class="text-2xl text-amber-600"></iconify-icon>
-                  </div>
+                <div className="flex items-center gap-3 text-clinical-900">
+                  <iconify-icon icon="lucide:alert-triangle" class="text-xl text-clinical-600"></iconify-icon>
                   <div>
-                    <h3 className="text-lg leading-tight">Factores de Riesgo (FR)</h3>
-                    <span className="text-sm font-semibold text-amber-700/80 block mt-0.5">Basta con presentar ≥ 1 factor</span>
+                    <h3 className="text-base font-semibold">Factores de Riesgo (FR)</h3>
+                    <span className="text-xs text-clinical-600 font-medium">Basta con presentar ≥ 1 factor</span>
                   </div>
                 </div>
-                <iconify-icon icon="lucide:chevron-down" class={`text-2xl text-amber-600 transition-transform duration-300 md:hidden ${riskOpen ? 'rotate-180' : ''}`}></iconify-icon>
+                <iconify-icon icon="lucide:chevron-down" class={`text-xl text-clinical-600 transition-transform duration-200 ${riskOpen ? 'rotate-180' : ''}`}></iconify-icon>
               </button>
               
-              <div className={`px-5 pb-6 md:px-6 md:block ${riskOpen ? 'block' : 'hidden md:block'}`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-amber-900/80">
-                  <div className="space-y-3 bg-white/40 p-4 rounded-2xl border border-white/50">
-                    <span className="font-extrabold text-amber-900 flex items-center gap-2">
+              <div className={`px-4 pb-5 md:px-5 border-t border-clinical-200 pt-4 ${riskOpen ? 'block' : 'hidden'}`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-clinical-800">
+                  <div>
+                    <span className="font-semibold text-clinical-900 flex items-center gap-2 mb-3 border-b border-clinical-200 pb-2">
                       <iconify-icon icon="lucide:user" class="text-base"></iconify-icon> Dependientes del paciente
                     </span>
                     <ul className="space-y-2">
                       {['> 70 años', 'Fumador', 'Obesidad', 'ASA III, IV, V', 'Diabetes Mellitus (DM)', 'Embarazo', 'Inmunosupresión', 'Antecedentes de patología biliar', 'Manipulación previa de vía biliar'].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 flex-shrink-0 shadow-sm" />
-                          <span className="font-medium">{item}</span>
+                        <li key={i} className="flex items-start gap-2 text-clinical-600">
+                          <span className="w-1.5 h-1.5 rounded-full bg-clinical-400 mt-1.5 flex-shrink-0"></span>
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="space-y-3 bg-white/40 p-4 rounded-2xl border border-white/50">
-                    <span className="font-extrabold text-amber-900 flex items-center gap-2">
+                  <div>
+                    <span className="font-semibold text-clinical-900 flex items-center gap-2 mb-3 border-b border-clinical-200 pb-2">
                       <iconify-icon icon="lucide:activity" class="text-base"></iconify-icon> Dependientes de la intervención
                     </span>
                     <ul className="space-y-2">
                       {['Drenaje biliar', 'Colangiografía intraoperatoria', 'Tiempo quirúrgico > 2 horas', 'Perforación de vesícula biliar', 'Conversión a cirugía abierta', 'Colocación de material protésico'].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 flex-shrink-0 shadow-sm" />
-                          <span className="font-medium">{item}</span>
+                        <li key={i} className="flex items-start gap-2 text-clinical-600">
+                          <span className="w-1.5 h-1.5 rounded-full bg-clinical-400 mt-1.5 flex-shrink-0"></span>
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -289,125 +271,108 @@
           );
 
           return (
-            <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-[#F8FAFC] to-slate-100 font-sans text-slate-800 flex flex-col selection:bg-indigo-200">
+            <div className="min-h-screen flex flex-col text-clinical-900">
               
-              <header className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-xl sticky top-0 z-40">
-                <div className="absolute inset-0 bg-[url('https://api.iconify.design/heroicons/shield-check.svg?color=white')] opacity-5 bg-[length:120px] mix-blend-overlay pointer-events-none" />
-                <div className="max-w-6xl mx-auto px-4 py-3 md:py-5 relative z-10">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-6">
+              {/* Sticky Header: Contiene Título y Pestañas para que no se desplacen en móvil */}
+              <header className="sticky top-0 z-50 bg-white border-b border-clinical-200 shadow-sm">
+                <div className="max-w-4xl mx-auto px-4">
+                  <div className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-6">
                     
                     {/* Header Left: Logo and Title */}
-                    <div className="flex items-center gap-3 md:gap-4">
-                      <div className="bg-white/10 backdrop-blur-md p-2.5 md:p-3 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] border border-white/10 shrink-0">
-                        <iconify-icon icon="lucide:syringe" class="text-[1.5rem] md:text-[2rem] text-blue-100 drop-shadow-md"></iconify-icon>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-clinical-100 p-2 rounded-lg text-action-600 shrink-0">
+                        <iconify-icon icon="lucide:file-text" class="text-2xl"></iconify-icon>
                       </div>
-                      <div>
-                        <h1 className="text-lg md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
-                          Profilaxis Antibiótica
+                      <div className="flex-1">
+                        <h1 className="text-base md:text-xl font-bold leading-tight">
+                          PROFILAXIS ANTIBIÓTICA QUIRÚRGICA
                         </h1>
-                        <p className="text-blue-200/80 text-[10px] md:text-sm font-semibold tracking-wide uppercase mt-0.5 md:mt-1">
-                          Guía de Práctica Clínica Quirúrgica
+                        <p className="text-clinical-600 text-[11px] md:text-xs font-medium uppercase tracking-wide">
+                          Soporte a la información clínica
                         </p>
                       </div>
                     </div>
                     
-                    {/* Header Right / Tabs (Sticky on all devices) */}
-                    <div className="flex bg-black/20 p-1 md:p-1.5 rounded-xl md:rounded-2xl backdrop-blur-sm border border-white/5 w-full md:w-auto mt-2 md:mt-0">
+                    {/* Tabs / Navegación */}
+                    <div className="flex bg-clinical-100 p-1 rounded-lg w-full md:w-auto shrink-0">
                       <button
                         onClick={() => { setActiveTab('algorithm'); window.scrollTo({top:0, behavior:'smooth'}); }}
-                        className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 md:gap-2 py-2 px-3 md:px-6 rounded-lg md:rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ${
-                          activeTab === 'algorithm' ? 'bg-white text-indigo-900 shadow-lg scale-100' : 'text-white/70 hover:text-white hover:bg-white/10'
+                        className={`btn-clinical flex-1 md:flex-none gap-2 px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
+                          activeTab === 'algorithm' ? 'bg-white text-action-700 shadow-sm' : 'text-clinical-600 hover:text-clinical-900'
                         }`}
                       >
-                        <iconify-icon icon="lucide:layout-grid" class="text-sm md:text-lg"></iconify-icon> Algoritmo
+                        <iconify-icon icon="lucide:layout-grid" class="text-lg"></iconify-icon> Algoritmo
                       </button>
                       <button
                         onClick={() => { setActiveTab('guide'); window.scrollTo({top:0, behavior:'smooth'}); }}
-                        className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 md:gap-2 py-2 px-3 md:px-6 rounded-lg md:rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 ${
-                          activeTab === 'guide' ? 'bg-white text-indigo-900 shadow-lg scale-100' : 'text-white/70 hover:text-white hover:bg-white/10'
+                        className={`btn-clinical flex-1 md:flex-none gap-2 px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
+                          activeTab === 'guide' ? 'bg-white text-action-700 shadow-sm' : 'text-clinical-600 hover:text-clinical-900'
                         }`}
                       >
-                        <iconify-icon icon="lucide:book-open" class="text-sm md:text-lg"></iconify-icon> Guía Completa
+                        <iconify-icon icon="lucide:book-open" class="text-lg"></iconify-icon> Guía Completa
                       </button>
                     </div>
                   </div>
                 </div>
               </header>
 
-              <main className="flex-grow max-w-6xl mx-auto w-full px-4 py-6 md:py-10">
+              <main className="flex-grow max-w-4xl mx-auto w-full px-4 py-6">
                 <div key={animationKey} className="animate-view">
                   
                   {activeTab === 'algorithm' && (
                     <div>
                       {!selectedSurgery ? (
                         <>
-                          <div className="mb-8 md:mb-10 text-center md:text-left">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight mb-2">Órgano o sistema</h2>
-                            <p className="text-slate-500 font-medium md:text-lg">Seleccione el área de intervención para iniciar el algoritmo clínico.</p>
+                          <div className="mb-6">
+                            <h2 className="text-xl font-bold text-clinical-900 mb-1">1. Seleccione el sistema</h2>
+                            <p className="text-sm text-clinical-600">Elija el área de intervención quirúrgica.</p>
                           </div>
                           
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                             {data.map((surgery) => (
                               <button
                                 key={surgery.id}
                                 onClick={() => handleSelectSurgery(surgery)}
-                                className="group relative overflow-hidden bg-white/70 backdrop-blur-xl border border-slate-200/80 p-5 rounded-[2rem] hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1.5 transition-all duration-300 text-left flex flex-col gap-5"
+                                className="group btn-clinical bg-white border border-clinical-200 p-4 rounded-xl hover:border-action-600 hover:shadow-sm transition-all text-left justify-start gap-4"
                               >
-                                <div className={`absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br ${surgery.color} opacity-5 rounded-full blur-2xl transition-transform group-hover:scale-150`} />
-                                
-                                <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center bg-gradient-to-br ${surgery.color} text-white shadow-lg group-hover:shadow-xl transition-all`}>
-                                  <iconify-icon icon={surgery.icon} class="text-[2.25rem] drop-shadow-md"></iconify-icon>
+                                <div className="bg-clinical-50 w-12 h-12 rounded-lg flex items-center justify-center text-clinical-700 group-hover:bg-action-50 group-hover:text-action-600 shrink-0 transition-colors">
+                                  <iconify-icon icon={surgery.icon} class="text-3xl"></iconify-icon>
                                 </div>
-                                
-                                <div className="mt-auto">
-                                  <span className="font-extrabold text-slate-800 text-xl leading-tight group-hover:text-indigo-700 transition-colors block mb-2">{surgery.category}</span>
-                                  <div className="flex items-center gap-1.5 text-sm font-bold text-slate-400 group-hover:text-indigo-500 transition-colors">
-                                    <span>Iniciar protocolo</span> 
-                                    <iconify-icon icon="lucide:chevron-right" class="text-base"></iconify-icon>
-                                  </div>
+                                <div>
+                                  <span className="font-semibold text-clinical-900 text-sm block group-hover:text-action-700 transition-colors">{surgery.category}</span>
                                 </div>
                               </button>
                             ))}
                           </div>
                         </>
                       ) : !selectedScenario ? (
-                        <div className="max-w-3xl mx-auto">
+                        <div className="max-w-2xl mx-auto">
                           <button 
                             onClick={resetAlgorithm}
-                            className="mb-8 text-sm text-indigo-600 hover:text-indigo-800 flex items-center gap-2 font-bold bg-indigo-50 hover:bg-indigo-100 px-5 py-2.5 rounded-full transition-all hover:-translate-x-1 shadow-sm w-fit"
+                            className="btn-clinical mb-4 text-sm text-action-600 hover:text-action-700 font-semibold gap-2 py-1 px-2 -ml-2 rounded-md hover:bg-action-50 transition-colors w-fit"
                           >
                             <iconify-icon icon="lucide:arrow-left" class="text-base"></iconify-icon> Volver a sistemas
                           </button>
                           
-                          <div className="bg-white rounded-[2.5rem] border border-slate-200/60 p-6 md:p-10 shadow-2xl shadow-slate-200/50 mb-8 relative overflow-hidden">
-                            <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${selectedSurgery.color} opacity-[0.03] rounded-bl-full -z-10`} />
-                            <div className="absolute top-10 right-10 opacity-[0.03] pointer-events-none">
-                              <iconify-icon icon={selectedSurgery.icon} class="text-[10rem] text-slate-900"></iconify-icon>
+                          <div className="bg-white rounded-xl border border-clinical-200 p-5 md:p-6 shadow-sm mb-6">
+                            <div className="flex items-center gap-3 mb-6 border-b border-clinical-100 pb-4">
+                              <div className="bg-clinical-100 w-10 h-10 rounded-lg flex items-center justify-center text-clinical-800 shrink-0">
+                                <iconify-icon icon={selectedSurgery.icon} class="text-2xl"></iconify-icon>
+                              </div>
+                              <h2 className="text-xl font-bold text-clinical-900 leading-tight">{selectedSurgery.category}</h2>
                             </div>
 
-                            <div className="flex flex-col md:flex-row md:items-center gap-5 mb-8">
-                              <div className={`w-20 h-20 shrink-0 rounded-[1.75rem] flex items-center justify-center bg-gradient-to-br ${selectedSurgery.color} text-white shadow-xl`}>
-                                <iconify-icon icon={selectedSurgery.icon} class="text-[2.75rem] drop-shadow-md"></iconify-icon>
-                              </div>
-                              <div>
-                                <span className="text-sm font-black text-slate-400 uppercase tracking-widest block mb-1">Paso 2 / Selección Clínica</span>
-                                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 leading-tight">Cirugía de {selectedSurgery.category.toLowerCase()}</h2>
-                              </div>
-                            </div>
-
-                            <p className="text-slate-500 font-bold mb-6 text-lg">¿Cuál es el escenario clínico del paciente?</p>
+                            <p className="text-clinical-800 font-semibold mb-4 text-sm">2. Seleccione el escenario clínico</p>
                             
-                            <div className="space-y-3.5">
+                            <div className="space-y-2">
                               {selectedSurgery.scenarios.map((scenario) => (
                                 <button
                                   key={scenario.id}
                                   onClick={() => setSelectedScenario(scenario)}
-                                  className="w-full text-left bg-slate-50/80 border border-slate-200/80 p-5 md:p-6 rounded-3xl hover:bg-white hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 transition-all flex items-center justify-between group"
+                                  className="w-full btn-clinical bg-white border border-clinical-200 px-4 py-3 rounded-lg hover:border-action-600 hover:bg-action-50 transition-all justify-between group"
                                 >
-                                  <span className="font-bold text-slate-700 group-hover:text-indigo-800 text-lg md:text-xl">{scenario.name}</span>
-                                  <div className="bg-white group-hover:bg-indigo-50 p-2.5 rounded-full shadow-sm border border-slate-100 group-hover:border-indigo-200 transition-all shrink-0 ml-4">
-                                    <iconify-icon icon="lucide:chevron-right" class="text-2xl text-slate-400 group-hover:text-indigo-600"></iconify-icon>
-                                  </div>
+                                  <span className="font-medium text-clinical-800 group-hover:text-action-700 text-sm text-left">{scenario.name}</span>
+                                  <iconify-icon icon="lucide:chevron-right" class="text-xl text-clinical-400 group-hover:text-action-600 shrink-0"></iconify-icon>
                                 </button>
                               ))}
                             </div>
@@ -416,92 +381,87 @@
                           <RiskFactorsCard />
                         </div>
                       ) : (
-                        <div className="max-w-3xl mx-auto">
-                          <div className="flex flex-wrap items-center gap-3 mb-8">
+                        <div className="max-w-2xl mx-auto">
+                          <div className="flex items-center gap-2 mb-6">
                             <button 
                               onClick={() => setSelectedScenario(null)}
-                              className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center gap-2 font-bold bg-indigo-50 hover:bg-indigo-100 px-5 py-2.5 rounded-full transition-all shadow-sm"
+                              className="btn-clinical text-sm text-action-600 hover:text-action-700 font-semibold gap-1 py-1 px-2 -ml-2 rounded-md hover:bg-action-50 transition-colors"
                             >
                               <iconify-icon icon="lucide:arrow-left" class="text-base"></iconify-icon> Escenarios
                             </button>
+                            <span className="text-clinical-300">|</span>
                             <button 
                               onClick={resetAlgorithm}
-                              className="text-sm text-slate-500 hover:text-slate-700 font-bold bg-white border border-slate-200 px-5 py-2.5 rounded-full transition-all shadow-sm hidden sm:block"
+                              className="btn-clinical text-sm text-clinical-600 hover:text-clinical-900 font-semibold py-1 px-2 rounded-md hover:bg-clinical-100 transition-colors"
                             >
                               Inicio
                             </button>
                           </div>
 
-                          <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-2xl shadow-slate-200/50 overflow-hidden relative">
-                            <div className={`absolute top-0 left-0 w-full h-3 bg-gradient-to-r ${selectedSurgery.color}`} />
+                          <div className="bg-white rounded-xl border border-clinical-200 shadow-sm overflow-hidden mb-6">
                             
-                            <div className="p-6 md:p-10 border-b border-slate-100/80">
-                              <div className="flex flex-wrap items-center gap-3 mb-5">
-                                <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-black ${selectedSurgery.bgLight} ${selectedSurgery.textDark} border border-white/50 shadow-sm`}>
-                                  <iconify-icon icon={selectedSurgery.icon} class="text-base"></iconify-icon>
-                                  {selectedSurgery.category}
-                                </div>
-                                <span className="text-slate-300 font-bold">/</span>
-                                <div className="bg-slate-100 text-slate-700 px-4 py-2 rounded-full text-sm font-bold shadow-inner">
-                                  {selectedScenario.name}
-                                </div>
+                            <div className="p-5 md:p-6 border-b border-clinical-100 bg-clinical-50">
+                              <div className="text-xs font-bold text-clinical-500 uppercase tracking-wide mb-2 flex items-center gap-2">
+                                <iconify-icon icon={selectedSurgery.icon} class="text-lg text-clinical-700"></iconify-icon> {selectedSurgery.category}
                               </div>
-                              <h2 className="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight">Recomendación</h2>
+                              <h2 className="text-lg md:text-xl font-bold text-clinical-900">{selectedScenario.name}</h2>
                             </div>
 
-                            <div className="p-6 md:p-10 bg-slate-50/30">
-                              <div className={`relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-6 p-6 md:p-8 rounded-[2rem] mb-8 border transition-all duration-500 ${isAllergic ? 'bg-red-50/80 border-red-200 shadow-inner' : 'bg-white border-slate-200 shadow-md'}`}>
-                                {isAllergic && <div className="absolute top-0 left-0 w-1.5 h-full bg-red-500" />}
-                                <div className="flex items-center gap-5">
-                                  <div className={`p-4 rounded-2xl transition-colors shadow-sm ${isAllergic ? 'bg-red-100' : 'bg-slate-100'}`}>
-                                    <iconify-icon icon="lucide:shield-alert" class={`text-[2rem] ${isAllergic ? 'text-red-600' : 'text-slate-500'}`}></iconify-icon>
-                                  </div>
+                            <div className="p-5 md:p-6">
+                              
+                              {/* Toggle Minimalista para Alergias (Único uso de rojo como alerta clínica) */}
+                              <div className={`flex items-center justify-between p-4 rounded-lg border mb-6 transition-colors ${isAllergic ? 'bg-alert-50 border-alert-100' : 'bg-white border-clinical-200'}`}>
+                                <div className="flex items-center gap-3">
+                                  <iconify-icon icon="lucide:shield-alert" class={`text-xl ${isAllergic ? 'text-alert-600' : 'text-clinical-400'}`}></iconify-icon>
                                   <div>
-                                    <span className="font-extrabold block text-slate-800 text-xl">Alergia a betalactámicos</span>
-                                    <span className={`text-sm font-bold mt-1 block ${isAllergic ? 'text-red-600/80' : 'text-slate-500'}`}>
-                                      {isAllergic ? 'Protocolo alternativo activado' : 'Ajustar si el paciente es alérgico'}
+                                    <span className="font-semibold block text-clinical-900 text-sm">Alergia a betalactámicos documentada</span>
+                                    <span className={`text-xs block ${isAllergic ? 'text-alert-700' : 'text-clinical-500'}`}>
+                                      {isAllergic ? 'Se muestra pauta alternativa' : 'Desactivado (Pauta estándar)'}
                                     </span>
                                   </div>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer self-start sm:self-auto">
-                                  <input 
-                                    type="checkbox" 
-                                    className="sr-only peer"
-                                    checked={isAllergic}
-                                    onChange={() => setIsAllergic(!isAllergic)}
-                                  />
-                                  <div className="w-16 h-9 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-[1.75rem] peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all peer-checked:bg-red-500 shadow-inner"></div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input type="checkbox" className="sr-only peer" checked={isAllergic} onChange={() => setIsAllergic(!isAllergic)} />
+                                  <div className="w-12 h-6 bg-clinical-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-alert-600"></div>
                                 </label>
                               </div>
 
-                              <div className={`p-8 md:p-10 rounded-[2rem] border-2 shadow-xl transition-all duration-500 relative overflow-hidden ${
-                                (isAllergic ? selectedScenario.alg : selectedScenario.std) === 'Sin profilaxis' 
-                                  ? 'bg-gradient-to-br from-emerald-50 via-emerald-100/50 to-green-50 border-emerald-300' 
-                                  : isAllergic 
-                                    ? 'bg-gradient-to-br from-red-50 via-red-100/50 to-rose-50 border-red-300'
-                                    : 'bg-gradient-to-br from-blue-50 via-blue-100/50 to-indigo-50 border-blue-300'
-                              }`}>
-                                
-                                <div className="absolute -bottom-6 -right-6 opacity-[0.05] pointer-events-none">
-                                  <iconify-icon icon="lucide:stethoscope" class="text-[12rem]"></iconify-icon>
-                                </div>
-
-                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-5 flex items-center gap-2.5">
-                                  <iconify-icon icon="lucide:syringe" class="text-xl"></iconify-icon> Pauta a administrar
-                                </h3>
-                                
-                                <div className="text-2xl md:text-4xl font-black text-slate-800 whitespace-pre-line leading-tight relative z-10">
-                                  {(isAllergic ? selectedScenario.alg : selectedScenario.std) === 'Sin profilaxis' ? (
-                                    <span className="flex items-center gap-3 text-emerald-700">
-                                      <iconify-icon icon="lucide:check-circle-2" class="text-[2.5rem] shrink-0"></iconify-icon> No indicada
-                                    </span>
-                                  ) : (
-                                    <span className={isAllergic ? 'text-red-900' : 'text-blue-900'}>
-                                      {isAllergic ? selectedScenario.alg : selectedScenario.std}
-                                    </span>
-                                  )}
+                              {/* Bloque de Información según la Guía */}
+                              <div className="mb-6">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-clinical-500 mb-2">Pauta según Guía</h3>
+                                <div className={`p-4 rounded-lg border bg-clinical-50 border-clinical-200`}>
+                                  <div className="text-lg md:text-xl font-bold text-clinical-900 whitespace-pre-line">
+                                    {(isAllergic ? selectedScenario.alg : selectedScenario.std) === 'Sin profilaxis' ? (
+                                      <span className="flex items-center gap-2 text-clinical-600">
+                                        No indicada
+                                      </span>
+                                    ) : (
+                                      <span>
+                                        {isAllergic ? selectedScenario.alg : selectedScenario.std}
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
+
+                              {/* Bloques Críticos Estáticos y Condicionales */}
+                              {((isAllergic ? selectedScenario.alg : selectedScenario.std) !== 'Sin profilaxis') && (
+                                <div className="space-y-3">
+                                  <div className="bg-alert-50 border border-alert-100 p-3 rounded-lg flex items-start gap-3">
+                                    <iconify-icon icon="lucide:alert-circle" class="text-alert-600 text-lg shrink-0 mt-0.5"></iconify-icon>
+                                    <p className="text-xs text-alert-700 leading-relaxed font-medium">
+                                      <strong>Ajuste renal/hepático:</strong> Verifique el filtrado glomerular y la función hepática del paciente. Ajuste la dosis según ficha técnica si procede.
+                                    </p>
+                                  </div>
+                                  <div className="bg-clinical-50 border border-clinical-200 p-3 rounded-lg flex items-start gap-3">
+                                    <iconify-icon icon="lucide:info" class="text-clinical-500 text-lg shrink-0 mt-0.5"></iconify-icon>
+                                    <p className="text-xs text-clinical-700 leading-relaxed">
+                                      <strong>Contraindicaciones:</strong> Revisar historia clínica para contraindicaciones específicas a los principios activos listados antes de su administración.
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
                             </div>
                           </div>
                         </div>
@@ -510,41 +470,39 @@
                   )}
 
                   {activeTab === 'guide' && (
-                    <div className="space-y-8">
-                      <div className="mb-8">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">Guía Clínica Completa</h2>
-                        <p className="text-slate-500 font-medium md:text-lg mt-2">Visión general estructurada de todas las indicaciones y pautas.</p>
+                    <div className="space-y-6">
+                      <div className="mb-6">
+                        <h2 className="text-xl font-bold text-clinical-900 mb-1">Guía Clínica Completa</h2>
+                        <p className="text-sm text-clinical-600">Tablas resumen de indicaciones y pautas.</p>
                       </div>
 
                       <RiskFactorsCard />
 
-                      <div className="grid gap-8">
+                      <div className="space-y-6">
                         {data.map((surgery) => (
-                          <div key={surgery.id} className="bg-white rounded-[2rem] border border-slate-200/80 shadow-lg overflow-hidden">
-                            <div className={`px-6 py-5 border-b border-slate-100 flex items-center gap-4 bg-gradient-to-r from-slate-50 to-white`}>
-                              <div className={`p-3 rounded-2xl bg-gradient-to-br ${surgery.color} text-white shadow-md`}>
-                                <iconify-icon icon={surgery.icon} class="text-2xl"></iconify-icon>
-                              </div>
-                              <h3 className="font-extrabold text-slate-800 text-xl md:text-2xl">{surgery.category}</h3>
+                          <div key={surgery.id} className="bg-white rounded-xl border border-clinical-200 shadow-sm overflow-hidden">
+                            <div className="px-4 py-3 border-b border-clinical-200 bg-clinical-50 flex items-center gap-3">
+                              <iconify-icon icon={surgery.icon} class="text-xl text-clinical-700"></iconify-icon>
+                              <h3 className="font-bold text-clinical-900 text-sm md:text-base">{surgery.category}</h3>
                             </div>
                             <div className="overflow-x-auto">
-                              <table className="w-full text-left border-collapse min-w-[600px]">
+                              <table className="w-full text-left border-collapse text-sm">
                                 <thead>
-                                  <tr className="bg-slate-50/50 text-slate-500 text-xs md:text-sm font-black uppercase tracking-wider">
-                                    <th className="p-5 border-b border-slate-200/60 w-1/3">Escenario / Indicación</th>
-                                    <th className="p-5 border-b border-slate-200/60 w-1/3 text-blue-700">Recomendación Estándar</th>
-                                    <th className="p-5 border-b border-slate-200/60 w-1/3 text-red-600">Alérgicos Betalactámicos</th>
+                                  <tr className="bg-white text-clinical-500 text-xs uppercase tracking-wide border-b border-clinical-200">
+                                    <th className="p-3 font-semibold w-1/3">Escenario clínico</th>
+                                    <th className="p-3 font-semibold w-1/3">Pauta estándar</th>
+                                    <th className="p-3 font-semibold w-1/3">Alérgicos Betalactámicos</th>
                                   </tr>
                                 </thead>
-                                <tbody className="text-sm md:text-base">
-                                  {surgery.scenarios.map((scen, idx) => (
-                                    <tr key={scen.id} className={`hover:bg-slate-50/80 transition-colors ${idx !== surgery.scenarios.length - 1 ? 'border-b border-slate-100' : ''}`}>
-                                      <td className="p-5 font-bold text-slate-700 bg-white/30">{scen.name}</td>
-                                      <td className="p-5 text-slate-700 font-medium whitespace-pre-line leading-relaxed">
-                                        {scen.std === 'Sin profilaxis' ? <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold text-xs uppercase tracking-wide"><iconify-icon icon="lucide:check-circle-2" class="text-base"></iconify-icon> No indicada</span> : scen.std}
+                                <tbody className="text-clinical-800 divide-y divide-clinical-100">
+                                  {surgery.scenarios.map((scen) => (
+                                    <tr key={scen.id} className="hover:bg-clinical-50">
+                                      <td className="p-3 font-medium align-top">{scen.name}</td>
+                                      <td className="p-3 whitespace-pre-line align-top">
+                                        {scen.std === 'Sin profilaxis' ? <span className="text-clinical-500">No indicada</span> : scen.std}
                                       </td>
-                                      <td className="p-5 text-slate-700 font-medium whitespace-pre-line leading-relaxed">
-                                        {scen.alg === 'Sin profilaxis' ? <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold text-xs uppercase tracking-wide"><iconify-icon icon="lucide:check-circle-2" class="text-base"></iconify-icon> No indicada</span> : scen.alg}
+                                      <td className="p-3 whitespace-pre-line align-top">
+                                        {scen.alg === 'Sin profilaxis' ? <span className="text-clinical-500">No indicada</span> : scen.alg}
                                       </td>
                                     </tr>
                                   ))}
@@ -559,23 +517,38 @@
                 </div>
               </main>
 
-              <footer className="bg-slate-950 text-slate-400 py-12 mt-auto border-t-4 border-indigo-600 relative z-10">
-                <div className="max-w-6xl mx-auto px-4 text-sm md:text-base space-y-6">
-                  <div className="flex flex-col md:flex-row justify-between gap-8 pb-8 border-b border-slate-800/80">
-                    <div className="space-y-2">
-                      <p className="font-black text-white text-xl tracking-tight mb-3">Consorcio Hospital General Universitario de Valencia (CHGUV)</p>
-                      <p className="flex items-start gap-2"><span className="text-slate-500 font-bold w-20 shrink-0">Servicio:</span> <span className="font-medium text-slate-300">Cirugía General y del Aparato Digestivo (SCGAD)</span></p>
-                      <p className="flex items-start gap-2"><span className="text-slate-500 font-bold w-20 shrink-0">Sección:</span> <span className="font-medium text-slate-300">Cirugía Esofagogástrica, Bariátrica y Pared Abdominal Compleja (CEG)</span></p>
-                    </div>
-                    <div className="bg-slate-900/50 p-6 rounded-[2rem] border border-slate-800/80 self-start md:self-auto space-y-2">
-                      <p className="flex items-center gap-2"><span className="text-slate-500 font-bold">Autores:</span> <span className="font-bold text-slate-200">Javier Tarrasa, Celia Báez, Alejandra De Andrés</span></p>
-                      <p className="flex items-center gap-2"><span className="text-slate-500 font-bold">Versión:</span> <span className="font-bold text-indigo-400">1.0</span></p>
+              {/* Trazabilidad y Descargo de Responsabilidad (MDR Compliance) */}
+              <footer className="mt-auto bg-white border-t border-clinical-200 pb-8 pt-6">
+                <div className="max-w-4xl mx-auto px-4 space-y-5">
+                  
+                  <div className="bg-clinical-50 rounded-lg p-4 text-xs text-clinical-700 space-y-2 border border-clinical-100">
+                    <p className="font-semibold text-clinical-900 text-sm">Aviso Legal y Descargo de Responsabilidad (MDR)</p>
+                    <p>Herramienta informativa de apoyo clínico. No constituye un producto sanitario de diagnóstico o decisión automática (no clasificado como alto riesgo bajo el Reglamento UE 2017/745 MDR). <strong>No sustituye el juicio clínico del profesional.</strong></p>
+                    <p>La prescripción final, evaluación de interacciones, contraindicaciones y ajustes de dosis son responsabilidad exclusiva del facultativo. Verifique siempre la información con las fichas técnicas oficiales de la AEMPS y fuentes primarias.</p>
+                    <p>Privacidad: Todo el cálculo y visualización se ejecuta localmente en el navegador. No se recogen ni envían datos de salud (cumplimiento GDPR).</p>
+                  </div>
+
+                  <div className="text-xs text-clinical-600 space-y-2">
+                    <p className="font-semibold text-clinical-900 text-sm">Bibliografía y Origen de los Datos</p>
+                    <p className="text-clinical-800"><strong>Protocolo de uso estrictamente interno:</strong> Este documento es un protocolo de elaboración propia concebido exclusivamente para el uso interno del servicio.</p>
+                    <ul className="space-y-1 list-none pl-0">
+                      <li><strong>Servicio:</strong> Cirugía General y del Aparato Digestivo (SCGAD). Sección CEG.</li>
+                      <li><strong>Centro:</strong> Consorcio Hospital General Universitario de Valencia (CHGUV).</li>
+                      <li><strong>Autores:</strong> Javier Tarrasa, Celia Báez, Alejandra De Andrés. Versión: 1.0.</li>
+                    </ul>
+                    <div className="pt-2">
+                      <a 
+                        href="https://docs.google.com/presentation/d/1YiBr53dk4QAevJICjE4MCIXP4HXFVq4v/edit?usp=share_link&ouid=112668181151097650207&rtpof=true&sd=true" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="inline-flex items-center gap-1.5 text-action-700 hover:text-action-800 bg-action-50 hover:bg-action-100 px-3 py-2 rounded-md transition-colors font-medium border border-action-200"
+                      >
+                        <iconify-icon icon="lucide:external-link" class="text-sm"></iconify-icon>
+                        Ver documento original del protocolo
+                      </a>
                     </div>
                   </div>
-                  <div className="flex items-start md:items-center gap-3 text-xs md:text-sm text-slate-500 font-bold">
-                    <iconify-icon icon="lucide:info" class="text-xl shrink-0 text-slate-600"></iconify-icon>
-                    <p>Bibliografía: Elaboración propia basada en la última evidencia científica y guías de práctica clínica disponibles para cirugía digestiva y pared abdominal.</p>
-                  </div>
+
                 </div>
               </footer>
             </div>
