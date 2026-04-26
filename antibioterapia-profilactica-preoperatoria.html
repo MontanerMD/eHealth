@@ -1,562 +1,1556 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soporte Clínico: Profilaxis Quirúrgica</title>
-    
-    <!-- Google Fonts: Inter para legibilidad clínica -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        clinical: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 600: '#475569', 800: '#1e293b', 900: '#0f172a' },
-                        alert: { 50: '#fef2f2', 100: '#fee2e2', 600: '#dc2626', 700: '#b91c1c' },
-                        action: { 50: '#eff6ff', 600: '#2563eb', 700: '#1d4ed8' }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Iconify -->
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="description" content="Herramienta informativa de apoyo a la consulta del protocolo de profilaxis antibiótica quirúrgica. No sustituye el juicio clínico.">
+<meta name="robots" content="noindex">
+<title>PROFILAXIS ANTIBIÓTICA QUIRÚRGICA</title>
 
-    <style>
-        body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; }
-        iconify-icon { display: inline-block; width: 1em; height: 1em; contain: strict; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-view { animation: fadeIn 0.3s ease-out forwards; }
-        
-        /* Botones mínimos de 44px para interacción segura en pantallas táctiles */
-        .btn-clinical { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
-        
-        /* Ocultar barra de desplazamiento para limpieza visual pero permitir scroll */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    </style>
+<!-- PWA mínima: manifest embebido como data URI para single-file deploy -->
+<link rel="manifest" href='data:application/manifest+json,{"name":"Profilaxis Quirúrgica","short_name":"Profilaxis","start_url":".","display":"standalone","background_color":"%23f8fafc","theme_color":"%230f172a","icons":[]}'>
+
+<style>
+/* ============================================================
+   Reset + variables (sin dependencias externas)
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Paleta clínica neutra de alto contraste */
+  --bg:        #f8fafc;
+  --surface:   #ffffff;
+  --surface-2: #f1f5f9;
+  --border:    #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text:      #0f172a;
+  --text-2:    #334155;
+  --text-3:    #64748b;
+  --primary:   #1e3a8a;   /* azul profundo neutro */
+  --primary-fg:#ffffff;
+  --info-bg:   #eff6ff;
+  --info-fg:   #1e40af;
+  --warn-bg:   #fffbeb;
+  --warn-fg:   #92400e;
+  --warn-bd:   #fde68a;
+  /* Rojo reservado EXCLUSIVAMENTE para contraindicaciones / alertas críticas */
+  --alert-bg:  #fef2f2;
+  --alert-fg:  #991b1b;
+  --alert-bd:  #fecaca;
+  --ok-bg:     #f0fdf4;
+  --ok-fg:     #166534;
+
+  --radius:    10px;
+  --radius-sm: 6px;
+  --shadow:    0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03);
+  --tap:       44px; /* mínimo táctil */
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 96px;
+}
+
+header.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  margin: 0 -16px 12px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-top)) 16px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+.app-header h1 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-header .tag {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 2px;
+  display: block;
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: inline-block;
+}
+
+/* Disclaimer permanente (MDR: herramienta informativa) */
+.disclaimer {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-bd);
+  color: var(--warn-fg);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+}
+.disclaimer strong { font-weight: 600; }
+.disclaimer .icn {
+  flex: 0 0 16px;
+  width: 16px; height: 16px;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   Vista: listado de cirugías
+   ============================================================ */
+.view-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin: 8px 4px 10px;
+}
+
+.search {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 15px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+.search:focus { outline: 2px solid var(--primary); outline-offset: -1px; border-color: transparent; }
+
+.list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.surgery-btn {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  transition: border-color .12s ease, background .12s ease;
+}
+.surgery-btn:hover { border-color: var(--border-strong); }
+.surgery-btn:active { background: var(--surface-2); }
+.surgery-btn .arrow {
+  flex: 0 0 auto;
+  color: var(--text-3);
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ============================================================
+   Vista: detalle / variantes
+   ============================================================ */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 8px 12px 8px 4px;
+  margin: 4px 0 8px -4px;
+  font-size: 14px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+.back .arrow { font-size: 18px; line-height: 1; }
+
+.detail h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -.01em;
+}
+.detail .sub {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 16px;
+}
+
+.scenarios {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.scenario-btn {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: left;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.scenario-btn[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--info-bg);
+  color: var(--info-fg);
+}
+.scenario-btn .label { font-weight: 500; }
+.scenario-btn .pill {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-3);
+  flex: 0 0 auto;
+}
+.scenario-btn[aria-pressed="true"] .pill {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+
+/* ============================================================
+   Resultado: información del protocolo
+   ============================================================ */
+.result {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.result-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.result-section:last-child { border-bottom: none; }
+.result-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
+.result-section .body {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.result-section .body ul {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.result-section .body li {
+  padding-left: 14px;
+  position: relative;
+}
+.result-section .body li::before {
+  content: "";
+  position: absolute;
+  left: 2px; top: 9px;
+  width: 4px; height: 4px;
+  background: var(--text-3);
+  border-radius: 50%;
+}
+
+.no-prophylaxis {
+  background: var(--ok-bg);
+  border-left: 3px solid #16a34a;
+  color: var(--ok-fg);
+}
+.no-prophylaxis h3 { color: var(--ok-fg); }
+
+/* Notas informativas neutras */
+.note {
+  background: var(--info-bg);
+  border: 1px solid #dbeafe;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--info-fg);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+/* ============================================================
+   Tabs (navegación principal)
+   ============================================================ */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 16px;
+}
+.tab {
+  min-height: var(--tap);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  transition: background .12s, color .12s;
+}
+.tab[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(15,23,42,.06);
+}
+
+/* ============================================================
+   Vista: GUÍA (tabla)
+   ============================================================ */
+.guide h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -.01em;
+}
+.guide .sub {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+
+/* Scroll horizontal en móvil para mantener legibilidad de la tabla */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 14px;
+  /* Sombra sutil que indica scroll lateral */
+  background-image:
+    linear-gradient(to right, var(--surface), var(--surface)),
+    linear-gradient(to right, var(--surface), var(--surface)),
+    linear-gradient(to right, rgba(15,23,42,.08), rgba(255,255,255,0)),
+    linear-gradient(to left,  rgba(15,23,42,.08), rgba(255,255,255,0));
+  background-position: left center, right center, left center, right center;
+  background-repeat: no-repeat;
+  background-color: var(--surface);
+  background-size: 20px 100%, 20px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+.guide-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 720px; /* fuerza scroll en móvil para mantener celdas legibles */
+}
+.guide-table caption {
+  caption-side: top;
+  text-align: left;
+  padding: 12px 14px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.guide-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-3);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.guide-table tbody td {
+  padding: 10px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  line-height: 1.4;
+}
+.guide-table tbody tr:last-child td { border-bottom: none; }
+.guide-table tbody tr:nth-child(even) td { background: rgba(15, 23, 42, .015); }
+@media (prefers-color-scheme: dark) {
+  .guide-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, .025); }
+}
+.guide-table .col-scen { font-weight: 600; min-width: 150px; }
+.guide-table .col-pauta,
+.guide-table .col-allergy { min-width: 220px; }
+.guide-table .none {
+  color: var(--text-3);
+  font-style: italic;
+}
+.guide-table .var {
+  display: block;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+}
+.guide-table .var-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+.guide-table .opt {
+  display: block;
+}
+
+.scroll-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-3);
+  margin: -8px 4px 14px;
+  font-style: italic;
+}
+
+/* ============================================================
+   Vista: FUENTES (bibliografía)
+   ============================================================ */
+.biblio h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -.01em;
+}
+.biblio .sub {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+.biblio-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.biblio-section h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
+.biblio-section p {
+  font-size: 13.5px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.biblio-section ul {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.biblio-section li {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.45;
+  padding-left: 12px;
+  position: relative;
+}
+.biblio-section li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  background: var(--text-3);
+  border-radius: 50%;
+}
+.biblio-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 10px 12px;
+  background: var(--info-bg);
+  color: var(--info-fg);
+  border: 1px solid #dbeafe;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  word-break: break-word;
+}
+@media (prefers-color-scheme: dark) {
+  .biblio-link { border-color: var(--border); }
+}
+.biblio-meta {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.biblio-meta strong { color: var(--text); font-weight: 600; }
+
+/* Bloques plegables crítico/ajuste: chevron animado */
+.collapsible-block {
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.collapsible-block summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  cursor: pointer;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  user-select: none;
+  -webkit-user-select: none;
+  min-height: var(--tap);
+}
+.collapsible-block summary::-webkit-details-marker { display: none; }
+.collapsible-block summary::marker { display: none; }
+.collapsible-block .chevron {
+  margin-left: auto;
+  flex: 0 0 16px;
+  width: 16px; height: 16px;
+  transition: transform .2s ease;
+}
+.collapsible-block[open] .chevron { transform: rotate(180deg); }
+.collapsible-block .block-body {
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 0 14px 12px;
+}
+.collapsible-block .block-body ul { list-style: none; display: grid; gap: 5px; }
+.collapsible-block .block-body li { padding-left: 12px; position: relative; }
+.collapsible-block .block-body li::before {
+  content: "";
+  position: absolute; left: 0; top: 8px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+}
+
+/* Variante roja: contraindicaciones */
+.collapsible-block.danger {
+  background: var(--alert-bg);
+  border: 1px solid var(--alert-bd);
+  border-left: 3px solid #dc2626;
+}
+.collapsible-block.danger summary { color: var(--alert-fg); }
+.collapsible-block.danger .block-body { color: var(--alert-fg); }
+.collapsible-block.danger .block-body li::before { background: var(--alert-fg); }
+
+/* Variante naranja: ajuste renal/hepático */
+.collapsible-block.warn-organ {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-left: 3px solid #ea580c;
+}
+.collapsible-block.warn-organ summary { color: #9a3412; }
+.collapsible-block.warn-organ .block-body { color: #7c2d12; }
+.collapsible-block.warn-organ .block-body li::before { background: #9a3412; }
+@media (prefers-color-scheme: dark) {
+  .collapsible-block.warn-organ {
+    background: #431407;
+    border-color: #9a3412;
+    border-left-color: #ea580c;
+  }
+  .collapsible-block.warn-organ summary { color: #fdba74; }
+  .collapsible-block.warn-organ .block-body { color: #fed7aa; }
+  .collapsible-block.warn-organ .block-body li::before { background: #fdba74; }
+}
+
+/* Toggle factores de riesgo */
+.fr-toggles {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.fr-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.fr-card h4 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+.fr-card p { font-size: 13px; color: var(--text-2); line-height: 1.4; }
+
+/* ============================================================
+   Footer (bibliografía + disclaimer fijo)
+   ============================================================ */
+footer.app-footer {
+  margin: 24px -16px 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+footer.app-footer h4 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+footer.app-footer ul {
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+footer.app-footer li {
+  padding-left: 10px;
+  position: relative;
+}
+footer.app-footer li::before {
+  content: "·";
+  position: absolute; left: 2px; top: 0;
+  color: var(--text-3);
+  font-weight: 700;
+}
+footer.app-footer .privacy {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ============================================================
+   Animaciones mínimas
+   ============================================================ */
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate { animation: fade .2s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate { animation: none; }
+}
+
+/* Modo oscuro suave (respeta preferencia del SO) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+    --border: #334155;
+    --border-strong: #475569;
+    --text: #f1f5f9;
+    --text-2: #cbd5e1;
+    --text-3: #94a3b8;
+    --primary: #60a5fa;
+    --primary-fg: #0f172a;
+    --info-bg: #1e3a5f;
+    --info-fg: #bfdbfe;
+    --warn-bg: #422c0a;
+    --warn-fg: #fbbf24;
+    --warn-bd: #78350f;
+    --alert-bg: #450a0a;
+    --alert-fg: #fca5a5;
+    --alert-bd: #7f1d1d;
+    --ok-bg: #14532d;
+    --ok-fg: #86efac;
+  }
+}
+</style>
 </head>
 <body>
-    <div style="position: absolute; width: 0; height: 0; overflow: hidden; visibility: hidden;" aria-hidden="true">
-        <iconify-icon icon="healthicons:skin-cancer"></iconify-icon>
-        <iconify-icon icon="healthicons:breasts"></iconify-icon>
-        <iconify-icon icon="healthicons:liver"></iconify-icon>
-        <iconify-icon icon="healthicons:gallbladder"></iconify-icon>
-        <iconify-icon icon="healthicons:stomach"></iconify-icon>
-        <iconify-icon icon="healthicons:overweight"></iconify-icon>
-        <iconify-icon icon="healthicons:intestine"></iconify-icon>
-        <iconify-icon icon="healthicons:colon"></iconify-icon>
-        <iconify-icon icon="healthicons:dhis2-logo"></iconify-icon>
-        <iconify-icon icon="healthicons:thyroid"></iconify-icon>
-        <iconify-icon icon="healthicons:spleen"></iconify-icon>
-        <iconify-icon icon="lucide:alert-triangle"></iconify-icon>
-        <iconify-icon icon="lucide:chevron-down"></iconify-icon>
-        <iconify-icon icon="lucide:user"></iconify-icon>
-        <iconify-icon icon="lucide:activity"></iconify-icon>
-        <iconify-icon icon="lucide:syringe"></iconify-icon>
-        <iconify-icon icon="lucide:layout-grid"></iconify-icon>
-        <iconify-icon icon="lucide:book-open"></iconify-icon>
-        <iconify-icon icon="lucide:chevron-right"></iconify-icon>
-        <iconify-icon icon="lucide:arrow-left"></iconify-icon>
-        <iconify-icon icon="lucide:shield-alert"></iconify-icon>
-        <iconify-icon icon="lucide:stethoscope"></iconify-icon>
-        <iconify-icon icon="lucide:check-circle-2"></iconify-icon>
-        <iconify-icon icon="lucide:info"></iconify-icon>
-        <iconify-icon icon="lucide:file-text"></iconify-icon>
-        <iconify-icon icon="lucide:alert-circle"></iconify-icon>
-        <iconify-icon icon="lucide:external-link"></iconify-icon>
+
+<div class="app">
+
+  <header class="app-header">
+    <h1><span class="dot" aria-hidden="true"></span>PROFILAXIS ANTIBIÓTICA QUIRÚRGICA</h1>
+    <span class="tag">Cirugía General y del Aparato Digestivo · v1.0</span>
+  </header>
+
+  <!-- Navegación por pestañas -->
+  <div class="tabs" role="tablist" aria-label="Navegación principal">
+    <button class="tab" role="tab" id="tab-consulta"
+            aria-selected="true" aria-controls="main"
+            data-tab="list" type="button">Consulta</button>
+    <button class="tab" role="tab" id="tab-guia"
+            aria-selected="false" aria-controls="main"
+            data-tab="guide" type="button">Guía</button>
+    <button class="tab" role="tab" id="tab-biblio"
+            aria-selected="false" aria-controls="main"
+            data-tab="biblio" type="button">Fuentes</button>
+  </div>
+
+  <!-- Disclaimer obligatorio (MDR) -->
+  <div class="disclaimer" role="note" id="disclaimer-banner">
+    <svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <div>
+      <strong>Herramienta informativa de apoyo.</strong> No sustituye el juicio clínico.
+      Verifique la información con las fuentes oficiales.
+    </div>
+  </div>
+
+  <main id="main" aria-live="polite"></main>
+
+  <footer class="app-footer"></footer>
+
+</div>
+
+<script>
+/* ============================================================
+   DATOS DEL PROTOCOLO
+   Fuente: Protocolo de profilaxis antibiótica quirúrgica
+   (Tarrasa · De Andrés · Báez)
+   Estructura: cada cirugía contiene escenarios; cada escenario
+   describe la indicación EXACTA según el protocolo, sin emitir
+   recomendaciones ni decisiones clínicas autónomas.
+   ============================================================ */
+
+const FACTORES_RIESGO = {
+  paciente: [
+    "Edad > 70 años",
+    "Tabaquismo activo",
+    "Obesidad",
+    "ASA III, IV, V",
+    "Diabetes mellitus",
+    "Embarazo",
+    "Inmunosupresión",
+    "Antecedentes de patología biliar",
+    "Manipulación previa de vía biliar"
+  ],
+  intervencion: [
+    "Drenaje biliar",
+    "Colangiografía intraoperatoria",
+    "Tiempo quirúrgico > 2 h",
+    "Perforación de vesícula biliar",
+    "Conversión a cirugía abierta",
+    "Colocación de material protésico"
+  ]
+};
+
+/* Cada escenario:
+   - id, label, pill (etiqueta breve)
+   - prophylaxis: null si "sin profilaxis"; objeto si la hay
+       · standard:  pauta estándar tal como figura en el protocolo
+       · special:   variantes (SARM nosocomial, BLEE, peso>160kg…)
+       · allergy:   pauta documentada para alérgicos a betalactámicos
+*/
+const PROTOCOLO = [
+  {
+    id: "piel",
+    nombre: "Cirugía de piel y partes blandas",
+    escenarios: [
+      { id: "sin-fr", label: "Sin factores de riesgo", pill: "Sin FR", prophylaxis: null },
+      { id: "con-fr", label: "Con factores de riesgo", pill: "Con FR",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special:  [{ titulo: "Colonización por SARM (nosocomial)",
+                       contenido: ["Cefazolina 2 g IV + Vancomicina 15 mg/kg"] }],
+          allergy:  [
+            "A) Clindamicina 600–900 mg",
+            "B) Vancomicina 15 mg/kg"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: "mama",
+    nombre: "Cirugía de mama",
+    escenarios: [
+      { id: "benigna-sin-fr", label: "Patología benigna sin factores de riesgo", pill: "Benigna sin FR", prophylaxis: null },
+      { id: "benigna-con-fr", label: "Patología benigna con factores de riesgo", pill: "Benigna con FR",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special:  [{ titulo: "Colonización por SARM (nosocomial)",
+                       contenido: ["Cefazolina 2 g IV + Vancomicina 15 mg/kg"] }],
+          allergy:  ["A) Clindamicina 600–900 mg", "B) Vancomicina 15 mg/kg"]
+        }
+      },
+      { id: "maligna", label: "Cirugía maligna o reconstructiva", pill: "Maligna / Reconstr.",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special:  [{ titulo: "Colonización por SARM (nosocomial)",
+                       contenido: ["Cefazolina 2 g IV + Vancomicina 15 mg/kg"] }],
+          allergy:  ["A) Clindamicina 600–900 mg", "B) Vancomicina 15 mg/kg"]
+        }
+      }
+    ]
+  },
+  {
+    id: "hep-panc",
+    nombre: "Cirugía hepática y pancreática",
+    escenarios: [
+      { id: "siempre", label: "Siempre indicada", pill: "Siempre",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special: [
+            { titulo: "Con factores de riesgo",
+              contenido: ["Cefuroxima 1,5 g + Metronidazol 15 mg/kg"] },
+            { titulo: "Cepa productora de BLEE",
+              contenido: ["Imipenem"] }
+          ],
+          allergy: [
+            "A) Vancomicina 15 mg/kg + Gentamicina 5 mg/kg",
+            "B) Clindamicina 600–900 mg + Gentamicina 5 mg/kg"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: "biliar",
+    nombre: "Cirugía de vía biliar",
+    escenarios: [
+      { id: "colelap-sin-fr", label: "Colecistectomía laparoscópica sin factores de riesgo", pill: "Colelap sin FR", prophylaxis: null },
+      { id: "resto", label: "Resto de procedimientos biliares", pill: "Resto",
+        prophylaxis: {
+          standard: ["Bajo riesgo: Cefazolina 2 g IV"],
+          special: [
+            { titulo: "Alto riesgo (con factores de riesgo)",
+              contenido: ["Cefuroxima 1,5 g + Metronidazol 15 mg/kg"] },
+            { titulo: "Cepa productora de BLEE",
+              contenido: ["Imipenem"] }
+          ],
+          allergy: [
+            "A) Vancomicina 15 mg/kg + Gentamicina 5 mg/kg",
+            "B) Clindamicina 600–900 mg + Gentamicina 5 mg/kg"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: "esof-gast",
+    nombre: "Cirugía esofágica, gástrica y duodenal",
+    escenarios: [
+      { id: "sin-rotura", label: "Sin rotura de mucosa y sin factores de riesgo", pill: "Sin rotura · Sin FR", prophylaxis: null },
+      { id: "resto", label: "Resto de procedimientos", pill: "Resto",
+        prophylaxis: {
+          standard: ["Bajo riesgo: Cefazolina 2 g IV"],
+          special: [
+            { titulo: "Alto riesgo (con factores de riesgo)",
+              contenido: ["Cefuroxima 1,5 g + Metronidazol 15 mg/kg"] },
+            { titulo: "Cepa productora de BLEE",
+              contenido: ["Imipenem"] }
+          ],
+          allergy: [
+            "A) Vancomicina 15 mg/kg",
+            "B) Clindamicina 600–900 mg + Gentamicina 5 mg/kg"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: "bariatrica",
+    nombre: "Cirugía bariátrica",
+    escenarios: [
+      { id: "siempre", label: "Siempre indicada", pill: "Siempre",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV  o  Cefuroxima 1,5 g IV"],
+          special: [
+            { titulo: "Peso > 160 kg",
+              contenido: ["Cefazolina 3 g IV  o  Cefuroxima 3 g IV"] }
+          ],
+          allergy: [
+            "A) Vancomicina 15 mg/kg + Gentamicina 5 mg/kg",
+            "B) Clindamicina 600–900 mg + Gentamicina 5 mg/kg"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: "delgado",
+    nombre: "Cirugía de intestino delgado",
+    escenarios: [
+      { id: "con-obstr", label: "Con obstrucción de intestino delgado", pill: "Con obstrucción",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV + Metronidazol 15 mg/kg"],
+          special: [],
+          allergy: ["Metronidazol 15 mg/kg + Gentamicina 5 mg/kg"]
+        }
+      },
+      { id: "sin-obstr", label: "Sin obstrucción de intestino delgado", pill: "Sin obstrucción",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special: [],
+          allergy: ["Clindamicina 600–900 mg + Gentamicina 5 mg/kg"]
+        }
+      }
+    ]
+  },
+  {
+    id: "colorrectal",
+    nombre: "Cirugía colorrectal",
+    escenarios: [
+      { id: "procto", label: "Cirugía proctológica", pill: "Proctológica", prophylaxis: null },
+      { id: "colon-recto-apend", label: "Cirugía de colon, recto y apéndice", pill: "Colon · Recto · Apéndice",
+        prophylaxis: {
+          standard: ["Bajo riesgo de BGN resistentes: Cefuroxima 1,5 g + Metronidazol 15 mg/kg"],
+          special: [
+            { titulo: "Alto riesgo de BGN resistentes",
+              contenido: ["Cefuroxima 1,5 g + Metronidazol 15 mg/kg + Gentamicina 5 mg/kg"] }
+          ],
+          allergy: ["Metronidazol 15 mg/kg + Gentamicina 5 mg/kg"]
+        }
+      }
+    ]
+  },
+  {
+    id: "pared",
+    nombre: "Cirugía de la pared abdominal",
+    escenarios: [
+      { id: "hernio-lap", label: "Hernioplastia laparoscópica", pill: "Hernio. lap.", prophylaxis: null },
+      { id: "hernio-abierta", label: "Hernioplastia abierta", pill: "Hernio. abierta",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special: [{ titulo: "Colonización por SARM (nosocomial)",
+                      contenido: ["Cefazolina 2 g IV + Vancomicina 15 mg/kg"] }],
+          allergy: ["A) Clindamicina 600–900 mg", "B) Vancomicina 15 mg/kg"]
+        }
+      }
+    ]
+  },
+  {
+    id: "cervical",
+    nombre: "Cirugía cervical",
+    escenarios: [
+      { id: "benigna", label: "Patología benigna", pill: "Benigna", prophylaxis: null },
+      { id: "maligna", label: "Patología maligna", pill: "Maligna",
+        prophylaxis: {
+          standard: ["Sin sospecha de SARM: Cefazolina 2 g IV  o  Amoxicilina-Clavulánico 2 g"],
+          special: [{ titulo: "Colonización por SARM (nosocomial)",
+                      contenido: ["Cefazolina 2 g IV + Vancomicina 15 mg/kg"] }],
+          allergy: ["A) Clindamicina 600–900 mg", "B) Vancomicina 15 mg/kg"]
+        }
+      }
+    ]
+  },
+  {
+    id: "bazo",
+    nombre: "Cirugía de bazo",
+    escenarios: [
+      { id: "electiva-sin-fr", label: "Electiva sin factores de riesgo", pill: "Electiva sin FR", prophylaxis: null },
+      { id: "electiva-con-fr-trauma", label: "Electiva con factores de riesgo o traumática", pill: "Con FR / Traumática",
+        prophylaxis: {
+          standard: ["Cefazolina 2 g IV"],
+          special: [],
+          allergy: [
+            "A) Vancomicina 15 mg/kg + Gentamicina 5 mg/kg",
+            "B) Clindamicina 600–900 mg + Gentamicina 5 mg/kg"
+          ]
+        }
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   ESTADO + RUTA (sin servidor; client-side)
+   ============================================================ */
+const state = {
+  view: "list",        // "list" | "detail" | "guide"
+  surgeryId: null,
+  scenarioId: null,
+  query: ""
+};
+
+const main = document.getElementById("main");
+
+/* Vinculación de los tabs (Consulta / Guía / Fuentes) */
+function bindTabs() {
+  document.querySelectorAll(".tab[data-tab]").forEach(tab => {
+    tab.addEventListener("click", () => {
+      const target = tab.getAttribute("data-tab");
+      if (target === "guide") {
+        setView({ view: "guide", surgeryId: null, scenarioId: null });
+      } else if (target === "biblio") {
+        setView({ view: "biblio", surgeryId: null, scenarioId: null });
+      } else {
+        setView({ view: "list", surgeryId: null, scenarioId: null });
+      }
+    });
+  });
+}
+
+function syncTabs() {
+  // En la vista detalle, la pestaña activa sigue siendo "Consulta"
+  const v = state.view;
+  document.getElementById("tab-consulta").setAttribute("aria-selected",
+    String(v === "list" || v === "detail"));
+  document.getElementById("tab-guia").setAttribute("aria-selected", String(v === "guide"));
+  document.getElementById("tab-biblio").setAttribute("aria-selected", String(v === "biblio"));
+  // Ocultar el banner amarillo solo en la pestaña Fuentes
+  document.getElementById("disclaimer-banner").style.display =
+    v === "biblio" ? "none" : "";
+}
+
+function setView(next) {
+  Object.assign(state, next);
+  render();
+  // Llevar el foco al inicio del main para lectores de pantalla
+  main.focus?.();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+
+/* ============================================================
+   RENDER (vanilla, sin frameworks)
+   Toda la información se construye localmente.
+   No hay llamadas de red ni almacenamiento de datos del paciente.
+   ============================================================ */
+
+function render() {
+  syncTabs();
+  if (state.view === "guide")  return renderGuide();
+  if (state.view === "biblio") return renderBiblio();
+  if (state.view === "detail") return renderDetail();
+  return renderList();
+}
+
+/* ============================================================
+   Vista: GUÍA — tabla por cirugía
+   Columnas: Escenario · Indicación · Pauta estándar · Alérgicos a betalactámicos
+   Las variantes (SARM, BLEE, peso > 160 kg, alto/bajo riesgo) se muestran
+   anidadas dentro de la celda "Pauta estándar" con su etiqueta.
+   ============================================================ */
+function renderGuide() {
+  main.innerHTML = `
+    <div class="animate guide">
+      <h2>Guía completa</h2>
+      <p class="sub">Volcado íntegro del protocolo. Información de consulta — la indicación final corresponde al facultativo.</p>
+      <span class="scroll-hint">Deslice horizontalmente la tabla en pantallas pequeñas.</span>
+
+      ${PROTOCOLO.map(s => `
+        <div class="table-wrap">
+          <table class="guide-table">
+            <caption>${escapeHtml(s.nombre)}</caption>
+            <thead>
+              <tr>
+                <th class="col-scen" scope="col">Escenario clínico</th>
+                <th class="col-pauta" scope="col">Pauta estándar</th>
+                <th class="col-allergy" scope="col">Alérgicos a betalactámicos</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${s.escenarios.map(e => renderGuideRow(e)).join("")}
+            </tbody>
+          </table>
+        </div>
+      `).join("")}
+
+      ${renderRiskFactorsHelp()}
+      ${renderCriticalBlock()}
+      ${renderAdjustBlock()}
+      ${renderClinicalNote()}
+    </div>
+  `;
+}
+
+function renderGuideRow(e) {
+  if (e.prophylaxis === null) {
+    return `
+      <tr>
+        <td class="col-scen">${escapeHtml(e.label)}</td>
+        <td class="col-pauta none">Sin profilaxis antibiótica.</td>
+        <td class="col-allergy none">Sin profilaxis antibiótica.</td>
+      </tr>
+    `;
+  }
+  const p = e.prophylaxis;
+  const standard = p.standard.map(t => `<span class="opt">${escapeHtml(t)}</span>`).join("");
+  const variants = (p.special || []).map(s => `
+    <span class="var">
+      <span class="var-label">${escapeHtml(s.titulo)}</span>
+      ${s.contenido.map(t => `<span class="opt">${escapeHtml(t)}</span>`).join("")}
+    </span>
+  `).join("");
+  const allergy = p.allergy.map(t => `<span class="opt">${escapeHtml(t)}</span>`).join("");
+
+  return `
+    <tr>
+      <td class="col-scen">${escapeHtml(e.label)}</td>
+      <td class="col-pauta">${standard}${variants}</td>
+      <td class="col-allergy">${allergy}</td>
+    </tr>
+  `;
+}
+
+/* ============================================================
+   Vista: FUENTES (bibliografía + metodología)
+   ============================================================ */
+function renderBiblio() {
+  main.innerHTML = `
+    <div class="animate biblio">
+      <h2>Fuentes y metodología</h2>
+      <p class="sub">Referencias que fundamentan el algoritmo y datos de autoría.</p>
+
+      <section class="biblio-section">
+        <h3>Metodología</h3>
+        <p>
+          Protocolo de elaboración propia para la prevención de la infección del sitio quirúrgico (ISQ)
+          en Cirugía General y del Aparato Digestivo. Síntesis adaptada a la especialidad y calibrada
+          con la ecología microbiológica local y las directrices PROA del centro.
+        </p>
+      </section>
+
+      <section class="biblio-section">
+        <h3>Estándares internacionales y prevención de ISQ</h3>
+        <ul>
+          <li>ASHP/IDSA/SIS/SHEA. Clinical Practice Guidelines for Antimicrobial Prophylaxis in Surgery, 2013.</li>
+          <li>WHO. Global Guidelines for the Prevention of Surgical Site Infection, 2.ª ed., 2018.</li>
+          <li>CDC. Guideline for the Prevention of Surgical Site Infection, 2017 · SHEA/IDSA/APIC, actualización 2022.</li>
+          <li>NICE NG125. Surgical site infections: prevention and treatment, 2020.</li>
+        </ul>
+      </section>
+
+      <section class="biblio-section">
+        <h3>Manejo de patógenos multirresistentes (BMR)</h3>
+        <ul>
+          <li>ESCMID/EUCIC. Profilaxis perioperatoria y descolonización en pacientes colonizados por BMR Gram-negativas, 2023.</li>
+          <li>ESCMID/EUCIC. Profilaxis perioperatoria y descolonización en pacientes colonizados por BMR Gram-positivas, 2024.</li>
+        </ul>
+      </section>
+
+      <section class="biblio-section">
+        <h3>Marco normativo nacional y ecología local</h3>
+        <ul>
+          <li>SEIMC/AEC. Documento de consenso sobre profilaxis antibiótica en cirugía, 2021.</li>
+          <li>Patrones locales de sensibilidad y resistencia antibiótica · Servicio de Microbiología (CHGUV).</li>
+          <li>Programa de Optimización de Uso de Antimicrobianos (PROA) institucional.</li>
+        </ul>
+      </section>
+
+      <section class="biblio-section">
+        <h3>Documento fuente</h3>
+        <a class="biblio-link"
+           href="https://docs.google.com/presentation/d/1YiBr53dk4QAevJICjE4MCIXP4HXFVq4v/edit?usp=share_link&amp;ouid=106703344099835029390&amp;rtpof=true&amp;sd=true"
+           target="_blank" rel="noopener noreferrer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          Abrir protocolo original (.pptx)
+        </a>
+      </section>
+
+      <section class="biblio-section">
+        <h3>Aviso legal y privacidad</h3>
+        <p style="margin-bottom: 8px;">
+          <strong>Herramienta informativa de apoyo.</strong> No sustituye el juicio clínico.
+          Verifique la información con las fuentes oficiales antes de cualquier prescripción.
+          El facultativo responsable es quien indica la pauta, valora alergias, contraindicaciones,
+          ajustes por función renal/hepática y posibles interacciones.
+        </p>
+        <p>
+          Procesamiento <strong>100&nbsp;% local</strong> en el navegador. No se recogen, almacenan
+          ni transmiten datos del paciente. Cumplimiento RGPD (UE 2016/679) y LOPDGDD 3/2018.
+        </p>
+      </section>
+
+      <div class="biblio-meta">
+        <strong>Servicio:</strong> Cirugía General y del Aparato Digestivo (SCGAD)<br>
+        <strong>Centro:</strong> Consorcio Hospital General Universitario de Valencia (CHGUV)<br>
+        <strong>Autores:</strong> Javier Tarrasa, Celia Báez y Alejandra De Andrés<br>
+        <strong>Versión:</strong> 1.0
+      </div>
+    </div>
+  `;
+}
+
+function renderList() {
+  const q = state.query.trim().toLowerCase();
+  const items = PROTOCOLO.filter(s =>
+    !q || s.nombre.toLowerCase().includes(q)
+  );
+
+  main.innerHTML = `
+    <div class="animate">
+      <p class="view-title">Seleccione el tipo de cirugía</p>
+      <input
+        class="search"
+        type="search"
+        inputmode="search"
+        autocomplete="off"
+        placeholder="Buscar tipo de cirugía…"
+        aria-label="Buscar tipo de cirugía"
+        value="${escapeAttr(state.query)}"
+      >
+      <ul class="list" role="list">
+        ${items.map(s => `
+          <li>
+            <button class="surgery-btn" data-surgery="${s.id}" type="button">
+              <span>${escapeHtml(s.nombre)}</span>
+              <span class="arrow" aria-hidden="true">›</span>
+            </button>
+          </li>
+        `).join("") || `
+          <li><div class="note">No se encontraron tipos de cirugía con ese término.</div></li>
+        `}
+      </ul>
+    </div>
+  `;
+
+  // Listeners
+  main.querySelector(".search").addEventListener("input", e => {
+    state.query = e.target.value;
+    // Re-render parcial: redibujamos solo la lista para no perder el foco del input
+    const list = main.querySelector(".list");
+    const newQ = state.query.trim().toLowerCase();
+    const newItems = PROTOCOLO.filter(s => !newQ || s.nombre.toLowerCase().includes(newQ));
+    list.innerHTML = newItems.map(s => `
+      <li>
+        <button class="surgery-btn" data-surgery="${s.id}" type="button">
+          <span>${escapeHtml(s.nombre)}</span>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
+      </li>
+    `).join("") || `<li><div class="note">No se encontraron tipos de cirugía con ese término.</div></li>`;
+    bindSurgeryButtons();
+  });
+  bindSurgeryButtons();
+}
+
+function bindSurgeryButtons() {
+  main.querySelectorAll("[data-surgery]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-surgery");
+      const surgery = PROTOCOLO.find(s => s.id === id);
+      // Si solo hay un escenario, ir directo a él
+      const initialScenario = surgery.escenarios.length === 1 ? surgery.escenarios[0].id : null;
+      setView({ view: "detail", surgeryId: id, scenarioId: initialScenario });
+    });
+  });
+}
+
+function renderDetail() {
+  const surgery = PROTOCOLO.find(s => s.id === state.surgeryId);
+  if (!surgery) { setView({ view: "list" }); return; }
+  const scenario = surgery.escenarios.find(e => e.id === state.scenarioId) || null;
+
+  main.innerHTML = `
+    <div class="animate detail">
+      <button class="back" id="btn-back" type="button">
+        <span class="arrow" aria-hidden="true">‹</span>
+        <span>Volver</span>
+      </button>
+      <h2>${escapeHtml(surgery.nombre)}</h2>
+      <p class="sub">Seleccione el escenario clínico aplicable.</p>
+
+      <ul class="scenarios" role="list">
+        ${surgery.escenarios.map(e => `
+          <li>
+            <button class="scenario-btn"
+                    data-scenario="${e.id}"
+                    aria-pressed="${state.scenarioId === e.id}"
+                    type="button">
+              <span class="label">${escapeHtml(e.label)}</span>
+              <span class="pill">${escapeHtml(e.pill)}</span>
+            </button>
+          </li>
+        `).join("")}
+      </ul>
+
+      <div id="scenario-output">
+        ${scenario ? renderScenario(scenario) : ''}
+      </div>
+
+      ${renderRiskFactorsHelp()}
+    </div>
+  `;
+
+  document.getElementById("btn-back").addEventListener("click", () => {
+    setView({ view: "list", surgeryId: null, scenarioId: null });
+  });
+
+  main.querySelectorAll("[data-scenario]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-scenario");
+      state.scenarioId = id;
+      // Re-render parcial sin perder posición
+      main.querySelectorAll("[data-scenario]").forEach(b => {
+        b.setAttribute("aria-pressed", b.getAttribute("data-scenario") === id);
+      });
+      const out = document.getElementById("scenario-output");
+      const sc = surgery.escenarios.find(e => e.id === id);
+      out.innerHTML = renderScenario(sc);
+      // Scroll al resultado
+      out.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
+function renderScenario(sc) {
+  // Sin profilaxis
+  if (sc.prophylaxis === null) {
+    return `
+      <div class="result animate" role="region" aria-label="Información del protocolo">
+        <div class="result-section no-prophylaxis">
+          <h3>Indicación según protocolo</h3>
+          <div class="body"><strong>Sin profilaxis antibiótica.</strong></div>
+        </div>
+      </div>
+      ${renderCriticalBlock()}
+      ${renderAdjustBlock()}
+      ${renderClinicalNote()}
+    `;
+  }
+
+  const p = sc.prophylaxis;
+
+  return `
+    <div class="result animate" role="region" aria-label="Información del protocolo">
+      <div class="result-section">
+        <h3>Pauta estándar (según protocolo)</h3>
+        <div class="body">
+          <ul>${p.standard.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+        </div>
+      </div>
+
+      ${p.special && p.special.length ? p.special.map(s => `
+        <div class="result-section">
+          <h3>${escapeHtml(s.titulo)}</h3>
+          <div class="body">
+            <ul>${s.contenido.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+          </div>
+        </div>
+      `).join("") : ""}
+
+      <div class="result-section">
+        <h3>Pauta documentada en alérgicos a betalactámicos</h3>
+        <div class="body">
+          <ul>${p.allergy.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+        </div>
+      </div>
     </div>
 
-    <div id="root"></div>
+    ${renderCriticalBlock()}
+    ${renderAdjustBlock()}
+    ${renderClinicalNote()}
+  `;
+}
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+/* Bloque CRÍTICO de contraindicaciones — plegable, siempre presente. */
+function renderCriticalBlock() {
+  return `
+    <details class="collapsible-block danger" role="note">
+      <summary aria-label="Contraindicaciones y verificación obligatoria">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Contraindicaciones / verificación obligatoria
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </summary>
+      <div class="block-body">
+        El facultativo debe verificar antes de la administración:
+        <ul>
+          <li><strong>Alergias documentadas</strong> a betalactámicos u otros antimicrobianos.</li>
+          <li><strong>Historia de reacción anafiláctica</strong> previa.</li>
+          <li><strong>Vancomicina:</strong> riesgo de "síndrome del hombre rojo" (infusión &gt; 60 min); precaución en insuficiencia renal y ototoxicidad.</li>
+          <li><strong>Aminoglucósidos (gentamicina):</strong> nefrotoxicidad y ototoxicidad; interacción con bloqueantes neuromusculares.</li>
+          <li><strong>Clindamicina:</strong> riesgo de colitis por <em>C. difficile</em>.</li>
+          <li><strong>Metronidazol:</strong> evitar consumo de alcohol; precaución en embarazo (1.<sup>er</sup> trimestre).</li>
+          <li><strong>Imipenem:</strong> ajustar en insuficiencia renal; precaución en antecedentes de epilepsia.</li>
+        </ul>
+      </div>
+    </details>
+  `;
+}
 
-        const data = [
-          {
-            id: 'piel',
-            category: 'Piel y partes blandas',
-            icon: 'healthicons:skin-cancer',
-            scenarios: [
-              { id: 'piel-1', name: 'Sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'piel-2', name: 'Con ≥ 1 FR', std: 'Cefazolina 2g iv', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
-              { id: 'piel-3', name: 'Colonización por SARM (Nosocomial)', std: 'Cefazolina 2g IV + Vancomicina 15mg/kg', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' }
-            ]
-          },
-          {
-            id: 'mama',
-            category: 'Mama',
-            icon: 'healthicons:breasts',
-            scenarios: [
-              { id: 'mama-1', name: 'Benigna sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'mama-2', name: 'Benigna con ≥ 1 FR', std: 'Cefazolina 2g IV', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
-              { id: 'mama-3', name: 'Maligna o reconstructiva', std: 'Cefazolina 2g IV', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
-              { id: 'mama-4', name: 'Colonización por SARM (Nosocomial)', std: 'Cefazolina 2g IV + Vancomicina 15mg/kg', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' }
-            ]
-          },
-          {
-            id: 'hepatica',
-            category: 'Hepática y pancreática',
-            icon: 'healthicons:liver',
-            scenarios: [
-              { id: 'hep-1', name: 'Habitual (SIEMPRE, sin otros FR específicos)', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'hep-2', name: 'Con ≥ 1 FR', std: 'Cefuroxima 1,5g + Metronidazol 15 mg/kg', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'hep-3', name: 'Cepa productora de BLEE', std: 'Imipenem', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
-            ]
-          },
-          {
-            id: 'biliar',
-            category: 'Vía biliar',
-            icon: 'healthicons:gallbladder',
-            scenarios: [
-              { id: 'bil-1', name: 'Colecistectomía laparoscópica sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'bil-2', name: 'Resto: Bajo riesgo', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'bil-3', name: 'Resto: Alto riesgo (≥ 1 FR)', std: 'Cefuroxima 1,5g + Metronidazol 15 mg/kg', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'bil-4', name: 'Cepa productora de BLEE', std: 'Imipenem', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
-            ]
-          },
-          {
-            id: 'esofagica',
-            category: 'Esofágica, gástrica y duodenal',
-            icon: 'healthicons:stomach',
-            scenarios: [
-              { id: 'eso-1', name: 'No rotura de mucosa sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'eso-2', name: 'Resto: Bajo riesgo', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'eso-3', name: 'Resto: Alto riesgo (≥ 1 FR)', std: 'Cefuroxima 1,5g + Metronidazol 15 mg/kg', alg: 'A) Vancomicina 15mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'eso-4', name: 'Productora de BLEE', std: 'Imipenem', alg: 'A) Vancomicina 15mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
-            ]
-          },
-          {
-            id: 'bariatrica',
-            category: 'Bariátrica',
-            icon: 'healthicons:overweight',
-            scenarios: [
-              { id: 'bar-1', name: 'Peso ≤ 160kg (SIEMPRE)', std: 'Cefazolina 2g o Cefuroxima 1,5g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' },
-              { id: 'bar-2', name: 'Peso > 160kg', std: 'Cefazolina 3g IV o Cefuroxima 3g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
-            ]
-          },
-          {
-            id: 'intestino',
-            category: 'Intestino delgado',
-            icon: 'healthicons:intestine',
-            scenarios: [
-              { id: 'int-1', name: 'Con obstrucción de intestino delgado', std: 'Cefazolina 2g IV + Metronidazol 15 mg/kg', alg: 'Metronidazol 15mg/kg + Gentamicina 5mg/kg' },
-              { id: 'int-2', name: 'Sin obstrucción de intestino delgado', std: 'Cefazolina 2g IV', alg: 'Clindamicina 600-900mg + Gentamicina 5mg/kg' }
-            ]
-          },
-          {
-            id: 'colorrectal',
-            category: 'Colorrectal',
-            icon: 'healthicons:colon',
-            scenarios: [
-              { id: 'col-1', name: 'Cirugía proctológica', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'col-2', name: 'Colon, recto y apéndice: Bajo riesgo BGN resistentes', std: 'Cefuroxima 1,5g + Metronidazol 15mg/kg', alg: 'Metronidazol 15mg/kg + Gentamicina 5mg/kg' },
-              { id: 'col-3', name: 'Colon, recto y apéndice: Alto riesgo de BGN resistentes', std: 'Cefuroxima 1,5g + Metronidazol 15mg/kg + Gentamicina 5mg/kg', alg: 'Metronidazol 15mg/kg + Gentamicina 5mg/kg' }
-            ]
-          },
-          {
-            id: 'pared',
-            category: 'Pared abdominal',
-            icon: 'healthicons:dhis2-logo',
-            scenarios: [
-              { id: 'par-1', name: 'Hernioplastia laparoscópica', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'par-2', name: 'Hernioplastia abierta (Sin colonización)', std: 'Cefazolina 2g IV', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
-              { id: 'par-3', name: 'Hernioplastia abierta: Colonización por SARM (Nosocomial)', std: 'Cefazolina 2g IV + Vancomicina 15mg/kg', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' }
-            ]
-          },
-          {
-            id: 'cervical',
-            category: 'Cervical',
-            icon: 'healthicons:thyroid',
-            scenarios: [
-              { id: 'cer-1', name: 'Benigna', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'cer-2', name: 'Maligna: No sospecha de SARM', std: 'Cefazolina 2g IV o Amoxicilina-Clavulánico 2g', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' },
-              { id: 'cer-3', name: 'Maligna: Colonización por SARM (Nosocomial)', std: 'Cefazolina 2g IV + Vancomicina 15mg/kg', alg: 'A) Clindamicina 600-900mg\nB) Vancomicina 15mg/kg' }
-            ]
-          },
-          {
-            id: 'bazo',
-            category: 'Bazo',
-            icon: 'healthicons:spleen',
-            scenarios: [
-              { id: 'baz-1', name: 'Electiva sin FR', std: 'Sin profilaxis', alg: 'Sin profilaxis' },
-              { id: 'baz-2', name: 'Electiva con ≥ 1 FR o traumática', std: 'Cefazolina 2g IV', alg: 'A) Vancomicina 15mg/kg + Gentamicina 5mg/kg\nB) Clindamicina 600-900mg + Gentamicina 5mg/kg' }
-            ]
-          }
-        ];
+/* Bloque CRÍTICO de ajuste por función orgánica — plegable. */
+function renderAdjustBlock() {
+  return `
+    <details class="collapsible-block warn-organ" role="note">
+      <summary aria-label="Ajuste por función renal o hepática y momento de administración">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        Ajuste renal / hepático · momento de administración
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </summary>
+      <div class="block-body">
+        <ul>
+          <li><strong>Momento:</strong> administración 30–60 min antes de la incisión (60–120 min para vancomicina y fluoroquinolonas).</li>
+          <li><strong>Redosificación intraoperatoria:</strong> valorar tras pérdida hemática &gt; 1.500 mL o cuando la duración exceda 2 vidas medias del fármaco.</li>
+          <li><strong>Dosificación por peso:</strong> cefazolina 2 g (3 g si peso &gt; 120 kg / &gt; 160 kg según protocolo); vancomicina y aminoglucósidos por kg de peso real (valorar peso ajustado en obesidad).</li>
+          <li><strong>Insuficiencia renal:</strong> ajustar vancomicina, aminoglucósidos e imipenem según aclaramiento de creatinina.</li>
+          <li><strong>Insuficiencia hepática:</strong> precaución con metronidazol y clindamicina.</li>
+        </ul>
+      </div>
+    </details>
+  `;
+}
 
-        function App() {
-          const [activeTab, setActiveTab] = useState('algorithm');
-          const [selectedSurgery, setSelectedSurgery] = useState(null);
-          const [selectedScenario, setSelectedScenario] = useState(null);
-          const [isAllergic, setIsAllergic] = useState(false);
-          const [riskOpen, setRiskOpen] = useState(false);
+function renderClinicalNote() {
+  return `
+    <div class="note" role="note">
+      Esta consulta muestra la información del protocolo. La indicación final, la dosis adaptada al paciente
+      y el resto de decisiones terapéuticas corresponden al facultativo responsable.
+    </div>
+  `;
+}
 
-          const handleSelectSurgery = (surgery) => {
-            setSelectedSurgery(surgery);
-            setSelectedScenario(null);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          };
+function renderRiskFactorsHelp() {
+  return `
+    <details class="collapsible-block" style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border-strong);" >
+      <summary style="color:var(--text-2);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+        Factores de riesgo (FR) — referencia
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </summary>
+      <div class="block-body" style="color:var(--text-2); display:grid; gap:10px;">
+        <div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">Dependientes del paciente</div>
+          <ul>${FACTORES_RIESGO.paciente.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">Dependientes de la intervención</div>
+          <ul>${FACTORES_RIESGO.intervencion.map(f => `<li>${escapeHtml(f)}</li>`).join("")}</ul>
+        </div>
+      </div>
+    </details>
+  `;
+}
 
-          const resetAlgorithm = () => {
-            setSelectedSurgery(null);
-            setSelectedScenario(null);
-          };
+/* ============================================================
+   Utilidades de escape (defensa contra XSS al inyectar HTML)
+   ============================================================ */
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+function escapeAttr(s) { return escapeHtml(s); }
 
-          const animationKey = `${activeTab}-${selectedSurgery?.id || 'root'}-${selectedScenario?.id || 'root'}`;
+/* ============================================================
+   Bootstrap
+   ============================================================ */
+bindTabs();
+render();
 
-          const RiskFactorsCard = () => (
-            <div className="bg-white border border-clinical-200 rounded-xl shadow-sm overflow-hidden mb-6">
-              <button 
-                onClick={() => setRiskOpen(!riskOpen)}
-                className="w-full btn-clinical px-4 py-3 md:p-5 text-left focus:outline-none flex justify-between items-center bg-clinical-50 hover:bg-clinical-100 transition-colors"
-              >
-                <div className="flex items-center gap-3 text-clinical-900">
-                  <iconify-icon icon="lucide:alert-triangle" class="text-xl text-clinical-600"></iconify-icon>
-                  <div>
-                    <h3 className="text-base font-semibold">Factores de Riesgo (FR)</h3>
-                    <span className="text-xs text-clinical-600 font-medium">Basta con presentar ≥ 1 factor</span>
-                  </div>
-                </div>
-                <iconify-icon icon="lucide:chevron-down" class={`text-xl text-clinical-600 transition-transform duration-200 ${riskOpen ? 'rotate-180' : ''}`}></iconify-icon>
-              </button>
-              
-              <div className={`px-4 pb-5 md:px-5 border-t border-clinical-200 pt-4 ${riskOpen ? 'block' : 'hidden'}`}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-clinical-800">
-                  <div>
-                    <span className="font-semibold text-clinical-900 flex items-center gap-2 mb-3 border-b border-clinical-200 pb-2">
-                      <iconify-icon icon="lucide:user" class="text-base"></iconify-icon> Dependientes del paciente
-                    </span>
-                    <ul className="space-y-2">
-                      {['> 70 años', 'Fumador', 'Obesidad', 'ASA III, IV, V', 'Diabetes Mellitus (DM)', 'Embarazo', 'Inmunosupresión', 'Antecedentes de patología biliar', 'Manipulación previa de vía biliar'].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-clinical-600">
-                          <span className="w-1.5 h-1.5 rounded-full bg-clinical-400 mt-1.5 flex-shrink-0"></span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-clinical-900 flex items-center gap-2 mb-3 border-b border-clinical-200 pb-2">
-                      <iconify-icon icon="lucide:activity" class="text-base"></iconify-icon> Dependientes de la intervención
-                    </span>
-                    <ul className="space-y-2">
-                      {['Drenaje biliar', 'Colangiografía intraoperatoria', 'Tiempo quirúrgico > 2 horas', 'Perforación de vesícula biliar', 'Conversión a cirugía abierta', 'Colocación de material protésico'].map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-clinical-600">
-                          <span className="w-1.5 h-1.5 rounded-full bg-clinical-400 mt-1.5 flex-shrink-0"></span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
+/* PWA: registro opcional de service worker si existe el archivo
+   sw.js (no se incluye aquí para mantener single-file).
+   Comentado intencionadamente — el archivo es 100% funcional offline
+   tras la primera carga al ser estático. */
+// if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
 
-          return (
-            <div className="min-h-screen flex flex-col text-clinical-900">
-              
-              {/* Sticky Header: Contiene Título y Pestañas para que no se desplacen en móvil */}
-              <header className="sticky top-0 z-50 bg-white border-b border-clinical-200 shadow-sm">
-                <div className="max-w-4xl mx-auto px-4">
-                  <div className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-6">
-                    
-                    {/* Header Left: Logo and Title */}
-                    <div className="flex items-center gap-3">
-                      <div className="bg-clinical-100 p-2 rounded-lg text-action-600 shrink-0">
-                        <iconify-icon icon="lucide:file-text" class="text-2xl"></iconify-icon>
-                      </div>
-                      <div className="flex-1">
-                        <h1 className="text-base md:text-xl font-bold leading-tight">
-                          PROFILAXIS ANTIBIÓTICA QUIRÚRGICA
-                        </h1>
-                        <p className="text-clinical-600 text-[11px] md:text-xs font-medium uppercase tracking-wide">
-                          Soporte a la información clínica
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Tabs / Navegación */}
-                    <div className="flex bg-clinical-100 p-1 rounded-lg w-full md:w-auto shrink-0">
-                      <button
-                        onClick={() => { setActiveTab('algorithm'); window.scrollTo({top:0, behavior:'smooth'}); }}
-                        className={`btn-clinical flex-1 md:flex-none gap-2 px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
-                          activeTab === 'algorithm' ? 'bg-white text-action-700 shadow-sm' : 'text-clinical-600 hover:text-clinical-900'
-                        }`}
-                      >
-                        <iconify-icon icon="lucide:layout-grid" class="text-lg"></iconify-icon> Algoritmo
-                      </button>
-                      <button
-                        onClick={() => { setActiveTab('guide'); window.scrollTo({top:0, behavior:'smooth'}); }}
-                        className={`btn-clinical flex-1 md:flex-none gap-2 px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-colors ${
-                          activeTab === 'guide' ? 'bg-white text-action-700 shadow-sm' : 'text-clinical-600 hover:text-clinical-900'
-                        }`}
-                      >
-                        <iconify-icon icon="lucide:book-open" class="text-lg"></iconify-icon> Guía Completa
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </header>
-
-              <main className="flex-grow max-w-4xl mx-auto w-full px-4 py-6">
-                <div key={animationKey} className="animate-view">
-                  
-                  {activeTab === 'algorithm' && (
-                    <div>
-                      {!selectedSurgery ? (
-                        <>
-                          <div className="mb-6">
-                            <h2 className="text-xl font-bold text-clinical-900 mb-1">1. Seleccione el sistema</h2>
-                            <p className="text-sm text-clinical-600">Elija el área de intervención quirúrgica.</p>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                            {data.map((surgery) => (
-                              <button
-                                key={surgery.id}
-                                onClick={() => handleSelectSurgery(surgery)}
-                                className="group btn-clinical bg-white border border-clinical-200 p-4 rounded-xl hover:border-action-600 hover:shadow-sm transition-all text-left justify-start gap-4"
-                              >
-                                <div className="bg-clinical-50 w-12 h-12 rounded-lg flex items-center justify-center text-clinical-700 group-hover:bg-action-50 group-hover:text-action-600 shrink-0 transition-colors">
-                                  <iconify-icon icon={surgery.icon} class="text-3xl"></iconify-icon>
-                                </div>
-                                <div>
-                                  <span className="font-semibold text-clinical-900 text-sm block group-hover:text-action-700 transition-colors">{surgery.category}</span>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      ) : !selectedScenario ? (
-                        <div className="max-w-2xl mx-auto">
-                          <button 
-                            onClick={resetAlgorithm}
-                            className="btn-clinical mb-4 text-sm text-action-600 hover:text-action-700 font-semibold gap-2 py-1 px-2 -ml-2 rounded-md hover:bg-action-50 transition-colors w-fit"
-                          >
-                            <iconify-icon icon="lucide:arrow-left" class="text-base"></iconify-icon> Volver a sistemas
-                          </button>
-                          
-                          <div className="bg-white rounded-xl border border-clinical-200 p-5 md:p-6 shadow-sm mb-6">
-                            <div className="flex items-center gap-3 mb-6 border-b border-clinical-100 pb-4">
-                              <div className="bg-clinical-100 w-10 h-10 rounded-lg flex items-center justify-center text-clinical-800 shrink-0">
-                                <iconify-icon icon={selectedSurgery.icon} class="text-2xl"></iconify-icon>
-                              </div>
-                              <h2 className="text-xl font-bold text-clinical-900 leading-tight">{selectedSurgery.category}</h2>
-                            </div>
-
-                            <p className="text-clinical-800 font-semibold mb-4 text-sm">2. Seleccione el escenario clínico</p>
-                            
-                            <div className="space-y-2">
-                              {selectedSurgery.scenarios.map((scenario) => (
-                                <button
-                                  key={scenario.id}
-                                  onClick={() => setSelectedScenario(scenario)}
-                                  className="w-full btn-clinical bg-white border border-clinical-200 px-4 py-3 rounded-lg hover:border-action-600 hover:bg-action-50 transition-all justify-between group"
-                                >
-                                  <span className="font-medium text-clinical-800 group-hover:text-action-700 text-sm text-left">{scenario.name}</span>
-                                  <iconify-icon icon="lucide:chevron-right" class="text-xl text-clinical-400 group-hover:text-action-600 shrink-0"></iconify-icon>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          <RiskFactorsCard />
-                        </div>
-                      ) : (
-                        <div className="max-w-2xl mx-auto">
-                          <div className="flex items-center gap-2 mb-6">
-                            <button 
-                              onClick={() => setSelectedScenario(null)}
-                              className="btn-clinical text-sm text-action-600 hover:text-action-700 font-semibold gap-1 py-1 px-2 -ml-2 rounded-md hover:bg-action-50 transition-colors"
-                            >
-                              <iconify-icon icon="lucide:arrow-left" class="text-base"></iconify-icon> Escenarios
-                            </button>
-                            <span className="text-clinical-300">|</span>
-                            <button 
-                              onClick={resetAlgorithm}
-                              className="btn-clinical text-sm text-clinical-600 hover:text-clinical-900 font-semibold py-1 px-2 rounded-md hover:bg-clinical-100 transition-colors"
-                            >
-                              Inicio
-                            </button>
-                          </div>
-
-                          <div className="bg-white rounded-xl border border-clinical-200 shadow-sm overflow-hidden mb-6">
-                            
-                            <div className="p-5 md:p-6 border-b border-clinical-100 bg-clinical-50">
-                              <div className="text-xs font-bold text-clinical-500 uppercase tracking-wide mb-2 flex items-center gap-2">
-                                <iconify-icon icon={selectedSurgery.icon} class="text-lg text-clinical-700"></iconify-icon> {selectedSurgery.category}
-                              </div>
-                              <h2 className="text-lg md:text-xl font-bold text-clinical-900">{selectedScenario.name}</h2>
-                            </div>
-
-                            <div className="p-5 md:p-6">
-                              
-                              {/* Toggle Minimalista para Alergias (Único uso de rojo como alerta clínica) */}
-                              <div className={`flex items-center justify-between p-4 rounded-lg border mb-6 transition-colors ${isAllergic ? 'bg-alert-50 border-alert-100' : 'bg-white border-clinical-200'}`}>
-                                <div className="flex items-center gap-3">
-                                  <iconify-icon icon="lucide:shield-alert" class={`text-xl ${isAllergic ? 'text-alert-600' : 'text-clinical-400'}`}></iconify-icon>
-                                  <div>
-                                    <span className="font-semibold block text-clinical-900 text-sm">Alergia a betalactámicos documentada</span>
-                                    <span className={`text-xs block ${isAllergic ? 'text-alert-700' : 'text-clinical-500'}`}>
-                                      {isAllergic ? 'Se muestra pauta alternativa' : 'Desactivado (Pauta estándar)'}
-                                    </span>
-                                  </div>
-                                </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                  <input type="checkbox" className="sr-only peer" checked={isAllergic} onChange={() => setIsAllergic(!isAllergic)} />
-                                  <div className="w-12 h-6 bg-clinical-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-alert-600"></div>
-                                </label>
-                              </div>
-
-                              {/* Bloque de Información según la Guía */}
-                              <div className="mb-6">
-                                <h3 className="text-xs font-bold uppercase tracking-wider text-clinical-500 mb-2">Pauta según Guía</h3>
-                                <div className={`p-4 rounded-lg border bg-clinical-50 border-clinical-200`}>
-                                  <div className="text-lg md:text-xl font-bold text-clinical-900 whitespace-pre-line">
-                                    {(isAllergic ? selectedScenario.alg : selectedScenario.std) === 'Sin profilaxis' ? (
-                                      <span className="flex items-center gap-2 text-clinical-600">
-                                        No indicada
-                                      </span>
-                                    ) : (
-                                      <span>
-                                        {isAllergic ? selectedScenario.alg : selectedScenario.std}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Bloques Críticos Estáticos y Condicionales */}
-                              {((isAllergic ? selectedScenario.alg : selectedScenario.std) !== 'Sin profilaxis') && (
-                                <div className="space-y-3">
-                                  <div className="bg-alert-50 border border-alert-100 p-3 rounded-lg flex items-start gap-3">
-                                    <iconify-icon icon="lucide:alert-circle" class="text-alert-600 text-lg shrink-0 mt-0.5"></iconify-icon>
-                                    <p className="text-xs text-alert-700 leading-relaxed font-medium">
-                                      <strong>Ajuste renal/hepático:</strong> Verifique el filtrado glomerular y la función hepática del paciente. Ajuste la dosis según ficha técnica si procede.
-                                    </p>
-                                  </div>
-                                  <div className="bg-clinical-50 border border-clinical-200 p-3 rounded-lg flex items-start gap-3">
-                                    <iconify-icon icon="lucide:info" class="text-clinical-500 text-lg shrink-0 mt-0.5"></iconify-icon>
-                                    <p className="text-xs text-clinical-700 leading-relaxed">
-                                      <strong>Contraindicaciones:</strong> Revisar historia clínica para contraindicaciones específicas a los principios activos listados antes de su administración.
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {activeTab === 'guide' && (
-                    <div className="space-y-6">
-                      <div className="mb-6">
-                        <h2 className="text-xl font-bold text-clinical-900 mb-1">Guía Clínica Completa</h2>
-                        <p className="text-sm text-clinical-600">Tablas resumen de indicaciones y pautas.</p>
-                      </div>
-
-                      <RiskFactorsCard />
-
-                      <div className="space-y-6">
-                        {data.map((surgery) => (
-                          <div key={surgery.id} className="bg-white rounded-xl border border-clinical-200 shadow-sm overflow-hidden">
-                            <div className="px-4 py-3 border-b border-clinical-200 bg-clinical-50 flex items-center gap-3">
-                              <iconify-icon icon={surgery.icon} class="text-xl text-clinical-700"></iconify-icon>
-                              <h3 className="font-bold text-clinical-900 text-sm md:text-base">{surgery.category}</h3>
-                            </div>
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-left border-collapse text-sm">
-                                <thead>
-                                  <tr className="bg-white text-clinical-500 text-xs uppercase tracking-wide border-b border-clinical-200">
-                                    <th className="p-3 font-semibold w-1/3">Escenario clínico</th>
-                                    <th className="p-3 font-semibold w-1/3">Pauta estándar</th>
-                                    <th className="p-3 font-semibold w-1/3">Alérgicos Betalactámicos</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="text-clinical-800 divide-y divide-clinical-100">
-                                  {surgery.scenarios.map((scen) => (
-                                    <tr key={scen.id} className="hover:bg-clinical-50">
-                                      <td className="p-3 font-medium align-top">{scen.name}</td>
-                                      <td className="p-3 whitespace-pre-line align-top">
-                                        {scen.std === 'Sin profilaxis' ? <span className="text-clinical-500">No indicada</span> : scen.std}
-                                      </td>
-                                      <td className="p-3 whitespace-pre-line align-top">
-                                        {scen.alg === 'Sin profilaxis' ? <span className="text-clinical-500">No indicada</span> : scen.alg}
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </main>
-
-              {/* Trazabilidad y Descargo de Responsabilidad (MDR Compliance) */}
-              <footer className="mt-auto bg-white border-t border-clinical-200 pb-8 pt-6">
-                <div className="max-w-4xl mx-auto px-4 space-y-5">
-                  
-                  <div className="bg-clinical-50 rounded-lg p-4 text-xs text-clinical-700 space-y-2 border border-clinical-100">
-                    <p className="font-semibold text-clinical-900 text-sm">Aviso Legal y Descargo de Responsabilidad (MDR)</p>
-                    <p>Herramienta informativa de apoyo clínico. No constituye un producto sanitario de diagnóstico o decisión automática (no clasificado como alto riesgo bajo el Reglamento UE 2017/745 MDR). <strong>No sustituye el juicio clínico del profesional.</strong></p>
-                    <p>La prescripción final, evaluación de interacciones, contraindicaciones y ajustes de dosis son responsabilidad exclusiva del facultativo. Verifique siempre la información con las fichas técnicas oficiales de la AEMPS y fuentes primarias.</p>
-                    <p>Privacidad: Todo el cálculo y visualización se ejecuta localmente en el navegador. No se recogen ni envían datos de salud (cumplimiento GDPR).</p>
-                  </div>
-
-                  <div className="text-xs text-clinical-600 space-y-2">
-                    <p className="font-semibold text-clinical-900 text-sm">Bibliografía y Origen de los Datos</p>
-                    <p className="text-clinical-800"><strong>Protocolo de uso estrictamente interno:</strong> Este documento es un protocolo de elaboración propia concebido exclusivamente para el uso interno del servicio.</p>
-                    <ul className="space-y-1 list-none pl-0">
-                      <li><strong>Servicio:</strong> Cirugía General y del Aparato Digestivo (SCGAD). Sección CEG.</li>
-                      <li><strong>Centro:</strong> Consorcio Hospital General Universitario de Valencia (CHGUV).</li>
-                      <li><strong>Autores:</strong> Javier Tarrasa, Celia Báez, Alejandra De Andrés. Versión: 1.0.</li>
-                    </ul>
-                    <div className="pt-2">
-                      <a 
-                        href="https://docs.google.com/presentation/d/1YiBr53dk4QAevJICjE4MCIXP4HXFVq4v/edit?usp=share_link&ouid=112668181151097650207&rtpof=true&sd=true" 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="inline-flex items-center gap-1.5 text-action-700 hover:text-action-800 bg-action-50 hover:bg-action-100 px-3 py-2 rounded-md transition-colors font-medium border border-action-200"
-                      >
-                        <iconify-icon icon="lucide:external-link" class="text-sm"></iconify-icon>
-                        Ver documento original del protocolo
-                      </a>
-                    </div>
-                  </div>
-
-                </div>
-              </footer>
-            </div>
-          );
-        }
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
 </body>
 </html>
