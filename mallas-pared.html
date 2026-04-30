@@ -282,7 +282,12 @@ header.app-header {
 }
 
 .mesh-meta {
-  display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-left: auto;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-left: auto; min-width: 0;
+}
+@media (max-width: 480px) {
+  .mesh-list-item { flex-direction: column; align-items: stretch; gap: 8px; }
+  .mesh-meta { margin-left: 0; width: 100%; justify-content: flex-start; }
+  .mesh-field-divider { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 8px; width: 100%; }
 }
 .mesh-field { display: flex; flex-direction: column; }
 .mesh-field .lbl {
